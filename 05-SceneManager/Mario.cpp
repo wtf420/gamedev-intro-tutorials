@@ -26,7 +26,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		untouchable = 0;
 	}
 	
-	if (!isOnPlatform)
+	if (!isOnPlatform && vy > 0.07)
 	{
 		CCollision::GetInstance()->Process(this, dt, coObjects);
 	} else if (isOnPlatformOneWay)
@@ -288,82 +288,118 @@ void CMario::Render()
 
 void CMario::SetState(int state)
 {
-	// DIE is the end state, cannot be changed! 
-	if (this->state == MARIO_STATE_DIE) return; 
-
-	switch (state)
+	if (isNoclipping)
 	{
-	case MARIO_STATE_RUNNING_RIGHT:
-		if (isSitting) break;
-		maxVx = MARIO_RUNNING_SPEED;
-		ax = MARIO_ACCEL_RUN_X;
-		nx = 1;
-		break;
-	case MARIO_STATE_RUNNING_LEFT:
-		if (isSitting) break;
-		maxVx = -MARIO_RUNNING_SPEED;
-		ax = -MARIO_ACCEL_RUN_X;
-		nx = -1;
-		break;
-	case MARIO_STATE_WALKING_RIGHT:
-		if (isSitting) break;
-		maxVx = MARIO_WALKING_SPEED;
-		ax = MARIO_ACCEL_WALK_X;
-		nx = 1;
-		break;
-	case MARIO_STATE_WALKING_LEFT:
-		if (isSitting) break;
-		maxVx = -MARIO_WALKING_SPEED;
-		ax = -MARIO_ACCEL_WALK_X;
-		nx = -1;
-		break;
-	case MARIO_STATE_JUMP:
-		if (isSitting) break;
-		if (isOnPlatform)
+		ay = 0;
+		switch (state)
 		{
-			if (abs(this->vx) == MARIO_RUNNING_SPEED)
-				vy = -MARIO_JUMP_RUN_SPEED_Y;
-			else
-				vy = -MARIO_JUMP_SPEED_Y;
+		case MARIO_STATE_WALKING_RIGHT:
+			maxVx = MARIO_WALKING_SPEED;
+			ax = MARIO_ACCEL_WALK_X;
+			nx = 1;
+			break;
+		case MARIO_STATE_WALKING_LEFT:
+			maxVx = -MARIO_WALKING_SPEED;
+			ax = -MARIO_ACCEL_WALK_X;
+			nx = -1;
+			break;
+		case MARIO_STATE_WALKING_DOWN:
+			maxVy = MARIO_WALKING_SPEED;
+			ay = MARIO_ACCEL_WALK_X;
+			break;
+		case MARIO_STATE_WALKING_UP:
+			maxVx = -MARIO_WALKING_SPEED;
+			ay = -MARIO_ACCEL_WALK_X;
+			break;
+		case MARIO_STATE_IDLE:
+			ax = 0.0f;
+			vx = 0.0f;
+			ay = 0.0f;
+			vy = 0.0f;
+			break;
 		}
-		break;
-
-	case MARIO_STATE_RELEASE_JUMP:
-		if (vy < 0) vy += MARIO_JUMP_SPEED_Y / 2;
-		break;
-
-	case MARIO_STATE_SIT:
-		if (isOnPlatform && level != MARIO_LEVEL_SMALL)
-		{
-			state = MARIO_STATE_IDLE;
-			isSitting = true;
-			vx = 0; vy = 0.0f;
-			y +=MARIO_SIT_HEIGHT_ADJUST;
-		}
-		break;
-
-	case MARIO_STATE_SIT_RELEASE:
-		if (isSitting)
-		{
-			isSitting = false;
-			state = MARIO_STATE_IDLE;
-			y -= MARIO_SIT_HEIGHT_ADJUST;
-		}
-		break;
-
-	case MARIO_STATE_IDLE:
-		ax = 0.0f;
-		vx = 0.0f;
-		break;
-
-	case MARIO_STATE_DIE:
-		vy = -MARIO_JUMP_DEFLECT_SPEED;
-		vx = 0;
-		ax = 0;
-		break;
 	}
+	else
+	{
+		ay = MARIO_GRAVITY;
+		// DIE is the end state, cannot be changed! 
+		if (this->state == MARIO_STATE_DIE) return;
 
-	CGameObject::SetState(state);
+		switch (state)
+		{
+		case MARIO_STATE_RUNNING_RIGHT:
+			if (isSitting) break;
+			maxVx = MARIO_RUNNING_SPEED;
+			ax = MARIO_ACCEL_RUN_X;
+			nx = 1;
+			break;
+		case MARIO_STATE_RUNNING_LEFT:
+			if (isSitting) break;
+			maxVx = -MARIO_RUNNING_SPEED;
+			ax = -MARIO_ACCEL_RUN_X;
+			nx = -1;
+			break;
+		case MARIO_STATE_WALKING_RIGHT:
+			if (isSitting) break;
+			maxVx = MARIO_WALKING_SPEED;
+			ax = MARIO_ACCEL_WALK_X;
+			nx = 1;
+			break;
+		case MARIO_STATE_WALKING_LEFT:
+			if (isSitting) break;
+			maxVx = -MARIO_WALKING_SPEED;
+			ax = -MARIO_ACCEL_WALK_X;
+			nx = -1;
+			break;
+		case MARIO_STATE_JUMP:
+			if (isSitting) break;
+			if (isOnPlatform)
+			{
+				if (abs(this->vx) == MARIO_RUNNING_SPEED)
+					vy = -MARIO_JUMP_RUN_SPEED_Y;
+				else
+					vy = -MARIO_JUMP_SPEED_Y;
+			}
+			break;
+
+		case MARIO_STATE_RELEASE_JUMP:
+			if (vy < 0) vy += MARIO_JUMP_SPEED_Y / 2;
+			break;
+
+		case MARIO_STATE_SIT:
+			if (isOnPlatform && level != MARIO_LEVEL_SMALL)
+			{
+				state = MARIO_STATE_IDLE;
+				isSitting = true;
+				vx = 0; vy = 0.0f;
+				y += MARIO_SIT_HEIGHT_ADJUST;
+			}
+			break;
+
+		case MARIO_STATE_SIT_RELEASE:
+			if (isSitting)
+			{
+				isSitting = false;
+				state = MARIO_STATE_IDLE;
+				y -= MARIO_SIT_HEIGHT_ADJUST;
+			}
+			break;
+
+		case MARIO_STATE_IDLE:
+			ax = 0.0f;
+			vx = 0.0f;
+			break;
+
+		case MARIO_STATE_DIE:
+			vy = -MARIO_JUMP_DEFLECT_SPEED;
+			vx = 0;
+			ax = 0;
+			break;
+		}
+
+		CGameObject::SetState(state);
+
+	}
 }
 
 void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom)
@@ -404,4 +440,7 @@ void CMario::SetLevel(int l)
 	level = l;
 }
 
-//aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+void CMario::ToggleNoclip()
+{
+	isNoclipping = !isNoclipping;
+}

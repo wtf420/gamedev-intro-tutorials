@@ -25,6 +25,9 @@ void CSampleKeyHandler::OnKeyDown(int KeyCode)
 	case DIK_2:
 		mario->SetLevel(MARIO_LEVEL_BIG);
 		break;
+	case DIK_3:
+		mario->ToggleNoclip();
+		break;
 	case DIK_0:
 		mario->SetState(MARIO_STATE_DIE);
 		break;
@@ -68,6 +71,14 @@ void CSampleKeyHandler::KeyState(BYTE *states)
 			mario->SetState(MARIO_STATE_RUNNING_LEFT);
 		else
 			mario->SetState(MARIO_STATE_WALKING_LEFT);
+	}
+	else if (game->IsKeyDown(DIK_UP))
+	{
+			mario->SetState(MARIO_STATE_WALKING_UP);
+	}
+	else if (game->IsKeyDown(DIK_DOWN))
+	{
+			mario->SetState(MARIO_STATE_WALKING_DOWN);
 	}
 	else
 		mario->SetState(MARIO_STATE_IDLE);

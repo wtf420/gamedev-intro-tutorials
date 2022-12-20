@@ -24,6 +24,8 @@
 #define MARIO_STATE_IDLE			0
 #define MARIO_STATE_WALKING_RIGHT	100
 #define MARIO_STATE_WALKING_LEFT	200
+#define MARIO_STATE_WALKING_UP		101
+#define MARIO_STATE_WALKING_DOWN	202
 
 #define MARIO_STATE_JUMP			300
 #define MARIO_STATE_RELEASE_JUMP    301
@@ -104,8 +106,9 @@
 
 class CMario : public CGameObject
 {
-	BOOLEAN isSitting;
+	BOOLEAN isSitting, isNoclipping;
 	float maxVx;
+	float maxVy;
 	float ax;				// acceleration on x 
 	float ay;				// acceleration on y 
 	float absx() { return x + (MARIO_BIG_BBOX_WIDTH / 2); };
@@ -132,6 +135,7 @@ public:
 	{
 		isSitting = false;
 		maxVx = 0.0f;
+		maxVy = 0.0f;
 		ax = 0.0f;
 		ay = MARIO_GRAVITY; 
 
@@ -141,6 +145,7 @@ public:
 		isOnPlatform = false;
 		isOnPlatformOneWay = false;
 		coin = 0;
+		isNoclipping = false;
 	}
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	void Render();
@@ -160,4 +165,5 @@ public:
 	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount64(); }
 
 	void GetBoundingBox(float& left, float& top, float& right, float& bottom);
+	void ToggleNoclip();
 };
