@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.h"
+#include "Platform.h"
 
 #include "Animation.h"
 #include "Animations.h"
@@ -116,6 +117,8 @@ class CMario : public CGameObject
 	ULONGLONG untouchable_start;
 	BOOLEAN isOnPlatform, isOnPlatformOneWay;
 	int coin; 
+
+	CPlatformOneWay *currentOneWayPlatform;
 
 	void OnCollisionWithGoomba(LPCOLLISIONEVENT e);
 	void OnCollisionWithCoin(LPCOLLISIONEVENT e);

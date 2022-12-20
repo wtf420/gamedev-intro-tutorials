@@ -31,7 +31,16 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		CCollision::GetInstance()->Process(this, dt, coObjects);
 	} else if (isOnPlatformOneWay)
 	{
-		CCollision::GetInstance()->Process(this, dt, coObjects);
+		vector<LPGAMEOBJECT> coObjects2;
+		for (int k = 0; k < coObjects->size(); k++)
+		{
+			CPlatformOneWay *u = dynamic_cast<CPlatformOneWay*>(coObjects->at(k));
+			if (!u || u == currentOneWayPlatform)
+			{
+				coObjects2.push_back(coObjects->at(k));
+			}
+		}
+		CCollision::GetInstance()->Process(this, dt, &coObjects2);
 	}
 	else {
 		vector<LPGAMEOBJECT> coObjects2;
@@ -45,8 +54,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		CCollision::GetInstance()->Process(this, dt, &coObjects2);
 	}
 
-	//string str = to_string(absx()) + "; " + to_string(absy());
-	string str = to_string(vy);
+	string str = to_string(absx()) + "; " + to_string(absy());
 	wstring widestr = std::wstring(str.begin(), str.end());
 	const wchar_t* widecstr = widestr.c_str();
 	DebugOutTitle(widecstr);
@@ -80,7 +88,10 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 	}
 
 	if (dynamic_cast<CPlatformOneWay*>(e->obj))
+	{
 		isOnPlatformOneWay = true;
+		currentOneWayPlatform = dynamic_cast<CPlatformOneWay*>(e->obj);
+	}
 	if (dynamic_cast<CGoomba*>(e->obj))
 		OnCollisionWithGoomba(e);
 	else if (dynamic_cast<CCoin*>(e->obj))
