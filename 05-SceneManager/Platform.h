@@ -33,3 +33,38 @@ public:
 };
 
 typedef CPlatform* LPPLATFORM;
+
+class CPlatform2 : public CGameObject
+{
+protected:
+	float length, height;
+public:
+	CPlatform2(float x, float y,
+		float a, float b ) :CGameObject(x, y)
+	{
+		length = a;
+		height = b;
+	}
+
+	void Render();
+	void Update(DWORD dt) {}
+	void GetBoundingBox(float& l, float& t, float& r, float& b);
+	void RenderBoundingBox();
+};
+
+class CPlatformOneWay : public CGameObject
+{
+protected:
+	float length, height;
+public:
+	CPlatformOneWay(float x, float y,
+		float a, float b) :CGameObject(x, y)
+	{
+		length = a;
+		height = b;
+	}
+
+	void Render();
+	void GetBoundingBox(float& l, float& t, float& r, float& b);
+	void RenderBoundingBox();
+};

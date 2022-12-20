@@ -30,7 +30,7 @@ void CPlatform::RenderBoundingBox()
 
 void CPlatform::Render()
 {
-	if (this->length <= 0) return; 
+	if (this->length <= 0) return;
 	float xx = x; 
 	CSprites * s = CSprites::GetInstance();
 
@@ -54,4 +54,76 @@ void CPlatform::GetBoundingBox(float& l, float& t, float& r, float& b)
 	t = y - this->cellHeight / 2;
 	r = l + this->cellWidth * this->length;
 	b = t + this->cellHeight;
+}
+
+/*
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                                    Pixel Platform
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa*/
+
+void CPlatform2::Render()
+{
+	RenderBoundingBox();
+}
+
+void CPlatform2::GetBoundingBox(float& l, float& t, float& r, float& b)
+{
+	l = x;
+	t = y;
+	r = l + (length);
+	b = t + (height);
+}
+
+void CPlatform2::RenderBoundingBox()
+{
+	D3DXVECTOR3 p(x, y, 0);
+	RECT rect;
+
+	LPTEXTURE bbox = CTextures::GetInstance()->Get(ID_TEX_BBOX);
+
+	rect.left = 0;
+	rect.top = 0;
+	rect.right = (int)length;
+	rect.bottom = (int)height;
+
+	float cx, cy;
+	CGame::GetInstance()->GetCamPos(cx, cy);
+
+	CGame::GetInstance()->Draw(x + length / 2 - cx, y + height / 2 - cy, bbox, &rect, BBOX_ALPHA);
+}
+
+/*
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+									One Way Platform
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa*/
+
+void CPlatformOneWay::Render()
+{
+	RenderBoundingBox();
+}
+
+void CPlatformOneWay::GetBoundingBox(float& l, float& t, float& r, float& b)
+{
+	l = x;
+	t = y;
+	r = l + (length);
+	b = t + (height);
+}
+
+void CPlatformOneWay::RenderBoundingBox()
+{
+	D3DXVECTOR3 p(x, y, 0);
+	RECT rect;
+
+	LPTEXTURE bbox = CTextures::GetInstance()->Get(ID_TEX_BBOX);
+
+	rect.left = 0;
+	rect.top = 0;
+	rect.right = (int)length;
+	rect.bottom = (int)height;
+
+	float cx, cy;
+	CGame::GetInstance()->GetCamPos(cx, cy);
+
+	CGame::GetInstance()->Draw(x + length / 2 - cx, y + height / 2 - cy, bbox, &rect, BBOX_ALPHA);
 }

@@ -107,11 +107,14 @@ class CMario : public CGameObject
 	float maxVx;
 	float ax;				// acceleration on x 
 	float ay;				// acceleration on y 
+	float absx() { return x + (MARIO_BIG_BBOX_WIDTH / 2); };
+	float absy() { return y + (MARIO_BIG_BBOX_HEIGHT / 2); };
+
 
 	int level; 
 	int untouchable; 
 	ULONGLONG untouchable_start;
-	BOOLEAN isOnPlatform;
+	BOOLEAN isOnPlatform, isOnPlatformOneWay;
 	int coin; 
 
 	void OnCollisionWithGoomba(LPCOLLISIONEVENT e);
@@ -133,6 +136,7 @@ public:
 		untouchable = 0;
 		untouchable_start = -1;
 		isOnPlatform = false;
+		isOnPlatformOneWay = false;
 		coin = 0;
 	}
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);

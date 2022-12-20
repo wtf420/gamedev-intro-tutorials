@@ -7,8 +7,10 @@
 #include "Goomba.h"
 #include "Coin.h"
 #include "Portal.h"
+#include "Platform.h"
 
 #include "Collision.h"
+#include <string>
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
@@ -23,14 +25,37 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		untouchable_start = 0;
 		untouchable = 0;
 	}
+	
+	if (!isOnPlatform)
+	{
+		CCollision::GetInstance()->Process(this, dt, coObjects);
+	} else if (isOnPlatformOneWay)
+	{
+		CCollision::GetInstance()->Process(this, dt, coObjects);
+	}
+	else {
+		vector<LPGAMEOBJECT> coObjects2;
+		for (int k = 0; k < coObjects->size(); k++)
+		{
+			if (!dynamic_cast<CPlatformOneWay*>(coObjects->at(k)))
+			{
+				coObjects2.push_back(coObjects->at(k));
+			}
+		}
+		CCollision::GetInstance()->Process(this, dt, &coObjects2);
+	}
 
-	isOnPlatform = false;
-
-	CCollision::GetInstance()->Process(this, dt, coObjects);
+	//string str = to_string(absx()) + "; " + to_string(absy());
+	string str = to_string(vy);
+	wstring widestr = std::wstring(str.begin(), str.end());
+	const wchar_t* widecstr = widestr.c_str();
+	DebugOutTitle(widecstr);
 }
 
 void CMario::OnNoCollision(DWORD dt)
 {
+	isOnPlatform = false;
+	isOnPlatformOneWay = false;
 	x += vx * dt;
 	y += vy * dt;
 }
@@ -40,7 +65,13 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 	if (e->ny != 0 && e->obj->IsBlocking())
 	{
 		vy = 0;
-		if (e->ny < 0) isOnPlatform = true;
+		isOnPlatformOneWay = false;
+		if (e->ny < 0) 
+			if (dynamic_cast<CPlatformOneWay*>(e->obj))
+			{
+				isOnPlatform = true;
+				isOnPlatformOneWay = true;
+			} else isOnPlatform = true;
 	}
 	else 
 	if (e->nx != 0 && e->obj->IsBlocking())
@@ -48,6 +79,8 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		vx = 0;
 	}
 
+	if (dynamic_cast<CPlatformOneWay*>(e->obj))
+		isOnPlatformOneWay = true;
 	if (dynamic_cast<CGoomba*>(e->obj))
 		OnCollisionWithGoomba(e);
 	else if (dynamic_cast<CCoin*>(e->obj))
@@ -240,8 +273,6 @@ void CMario::Render()
 	animations->Get(aniId)->Render(x, y);
 
 	//RenderBoundingBox();
-	
-	DebugOutTitle(L"Coins: %d", coin);
 }
 
 void CMario::SetState(int state)
@@ -362,3 +393,4 @@ void CMario::SetLevel(int l)
 	level = l;
 }
 
+//aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa

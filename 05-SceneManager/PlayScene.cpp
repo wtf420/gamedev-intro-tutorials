@@ -9,6 +9,7 @@
 #include "Portal.h"
 #include "Coin.h"
 #include "Platform.h"
+#include "CBackground.h"
 
 #include "SampleKeyEventHandler.h"
 
@@ -105,6 +106,10 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 	switch (object_type)
 	{
+	case OBJECT_TYPE_BACKGROUND:
+		obj = new CBackground(x,y);
+		DebugOut(L"[INFO] Background has been created!\n");
+		break;
 	case OBJECT_TYPE_MARIO:
 		if (player!=NULL) 
 		{
@@ -119,6 +124,34 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(x,y); break;
 	case OBJECT_TYPE_BRICK: obj = new CBrick(x,y); break;
 	case OBJECT_TYPE_COIN: obj = new CCoin(x, y); break;
+
+	case OBJECT_TYPE_PLATFORM2:
+	{
+
+		float a = (float)atof(tokens[3].c_str());
+		float b = (float)atof(tokens[4].c_str());
+
+		obj = new CPlatform2(
+			x, y, a, b
+		);
+		
+
+		break;
+	}
+
+	case OBJECT_TYPE_PLATFORM_ONEWAY:
+	{
+
+		float a = (float)atof(tokens[3].c_str());
+		float b = (float)atof(tokens[4].c_str());
+
+		obj = new CPlatformOneWay(
+			x, y, a, b
+		);
+
+
+		break;
+	}
 
 	case OBJECT_TYPE_PLATFORM:
 	{
