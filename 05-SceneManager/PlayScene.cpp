@@ -10,6 +10,8 @@
 #include "Coin.h"
 #include "Platform.h"
 #include "CBackground.h"
+#include "Myth.h"
+#include "Rewards.h"
 
 #include "SampleKeyEventHandler.h"
 
@@ -124,6 +126,34 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(x,y); break;
 	case OBJECT_TYPE_BRICK: obj = new CBrick(x,y); break;
 	case OBJECT_TYPE_COIN: obj = new CCoin(x, y); break;
+	case OBJECT_TYPE_MYTH_COIN:
+	{
+
+		CRCoin* r = new CRCoin(x, y);
+		r->SetPosition(x, y);
+
+
+		objects.push_back(r);
+
+		obj = new CMyth(x, y, 1, r);
+
+
+		break;
+	}
+	case OBJECT_TYPE_MYTH_MUSHROOM:
+	{
+
+		CRMushroom* m = new CRMushroom(x, y);
+		m->SetPosition(x, y);
+
+
+		objects.push_back(m);
+
+		obj = new CMyth(x, y, 2, m);
+
+
+		break;
+	}
 
 	case OBJECT_TYPE_PLATFORM2:
 	{

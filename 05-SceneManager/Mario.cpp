@@ -8,6 +8,8 @@
 #include "Coin.h"
 #include "Portal.h"
 #include "Platform.h"
+#include "Myth.h"
+#include "Rewards.h"
 
 #include "Collision.h"
 #include <string>
@@ -92,7 +94,15 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		isOnPlatformOneWay = true;
 		currentOneWayPlatform = dynamic_cast<CPlatformOneWay*>(e->obj);
 	}
-	if (dynamic_cast<CGoomba*>(e->obj))
+	if (dynamic_cast<CMyth*>(e->obj))
+	{
+		if (e->ny > 0)
+		{
+			CMyth* myth = dynamic_cast<CMyth*>(e->obj);
+			myth->Interact();
+		}
+	}
+	else if (dynamic_cast<CGoomba*>(e->obj))
 		OnCollisionWithGoomba(e);
 	else if (dynamic_cast<CCoin*>(e->obj))
 		OnCollisionWithCoin(e);
@@ -137,13 +147,19 @@ void CMario::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
 void CMario::OnCollisionWithCoin(LPCOLLISIONEVENT e)
 {
 	e->obj->Delete();
-	coin++;
+	AddCoin();
 }
 
 void CMario::OnCollisionWithPortal(LPCOLLISIONEVENT e)
 {
 	CPortal* p = (CPortal*)e->obj;
 	CGame::GetInstance()->InitiateSwitchScene(p->GetSceneId());
+}
+
+void CMario::OnCollisionWithMushroom()
+{
+	if (level == MARIO_LEVEL_SMALL)
+		SetLevel(MARIO_LEVEL_BIG);
 }
 
 //
@@ -435,6 +451,7 @@ void CMario::SetLevel(int l)
 	// Adjust position to avoid falling off platform
 	if (this->level == MARIO_LEVEL_SMALL)
 	{
+		
 		y -= (MARIO_BIG_BBOX_HEIGHT - MARIO_SMALL_BBOX_HEIGHT) / 2;
 	}
 	level = l;

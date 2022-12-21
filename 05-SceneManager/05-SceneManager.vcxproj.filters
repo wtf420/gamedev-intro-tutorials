@@ -78,6 +78,12 @@
     <ClCompile Include="CBackground.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Myth.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Rewards.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h">
@@ -150,6 +156,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CBackground.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Myth.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Rewards.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
