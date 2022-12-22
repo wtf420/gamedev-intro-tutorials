@@ -7,6 +7,7 @@ goomba.txt
 cloud.txt
 background.txt
 myth.txt
+koopas.txt
 #
 [OBJECTS]
 # type	x	y	extra_settings per object type
@@ -18,6 +19,15 @@ myth.txt
 
 # MARIO
 0	20	50
+
+#Goomba
+2	225	160
+2	590	160
+2	773	150
+2	873	150
+
+#KOOPAS
+3	590	50
 
 # COIN
 4 	1071	86
@@ -75,7 +85,7 @@ myth.txt
 8 	224	70
 9 	240	70
 8	416	86
-8 	655	150
+9 	655	150
 8	703	116
 8	1472	134
 

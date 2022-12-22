@@ -12,6 +12,7 @@
 #include "CBackground.h"
 #include "Myth.h"
 #include "Rewards.h"
+#include "Koopas.h"
 
 #include "SampleKeyEventHandler.h"
 
@@ -124,6 +125,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		DebugOut(L"[INFO] Player object has been created!\n");
 		break;
 	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(x,y); break;
+	case OBJECT_TYPE_KOOPAS: obj = new CKoopas(x, y); break;
 	case OBJECT_TYPE_BRICK: obj = new CBrick(x,y); break;
 	case OBJECT_TYPE_COIN: obj = new CCoin(x, y); break;
 	case OBJECT_TYPE_MYTH_COIN:
@@ -131,11 +133,9 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 		CRCoin* r = new CRCoin(x, y);
 		r->SetPosition(x, y);
-
-
 		objects.push_back(r);
 
-		obj = new CMyth(x, y, 1, r);
+		obj = new CMyth(x, y, 1, r, NULL);
 
 
 		break;
@@ -145,11 +145,13 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 		CRMushroom* m = new CRMushroom(x, y);
 		m->SetPosition(x, y);
-
-
 		objects.push_back(m);
 
-		obj = new CMyth(x, y, 2, m);
+		CRMushroom* m2 = new CRMushroom(x, y);
+		m2->SetPosition(x, y);
+		objects.push_back(m2);
+
+		obj = new CMyth(x, y, 2, m, m2);
 
 
 		break;

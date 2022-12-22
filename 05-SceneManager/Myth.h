@@ -5,6 +5,8 @@
 #include "Animations.h"
 
 #include "Rewards.h"
+#include "Mario.h"
+#include "Playscene.h"
 
 #define ID_ANI_MYTH 61000
 #define ID_ANI_MYTH_DIED 69000
@@ -24,17 +26,12 @@ public:
 	float originalY, maxY, maxvy;
 	float ay;				// acceleration on y 
 	bool touched;
-	CGameObject* reward;
+	CMario* mario;
+	CRCoin* coin;
+	CRMushroom* mushroom;
+	CRMushroom* leaf;
 
-	CMyth(float x, float y, int t, CGameObject* r) : CGameObject(x, y) { 
-		type = t;
-		touched = false;
-		originalY = y;
-		maxY = y - 8;
-		maxvy = 0;
-		ay = 0;
-		reward = r;
-	}
+	CMyth(float x, float y, int t, CGameObject* m, CGameObject* l);
 	void Interact();
 	void Render();
 	void Reward();

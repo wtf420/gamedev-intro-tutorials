@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.h"
+#include "Mario.h"
 
 #define GOOMBA_GRAVITY 0.002f
 #define GOOMBA_WALKING_SPEED 0.05f
@@ -23,7 +24,9 @@ protected:
 	float ax;				
 	float ay; 
 
+	CMario *mario;
 	ULONGLONG die_start;
+	CGameObject* currentPlatform;
 
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects);

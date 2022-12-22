@@ -2,6 +2,27 @@
 #include "Debug.h"
 #include "Rewards.h"
 
+CMyth::CMyth(float x, float y, int t, CGameObject* m, CGameObject* l) : CGameObject(x, y) {
+	mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+	type = t;
+	touched = false;
+	originalY = y;
+	maxY = y - 8;
+	maxvy = 0;
+	ay = 0;
+
+	switch (type)
+	{
+		case TYPE_COIN:
+			coin = dynamic_cast<CRCoin*>(m);
+		break;
+		case TYPE_MUSHROOM:
+			mushroom = dynamic_cast<CRMushroom*>(m);
+			leaf = dynamic_cast<CRMushroom*>(l);
+		break;
+	}
+}
+
 void CMyth::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	if (y > maxY && ay < 0) vy += ay * dt; else
@@ -53,14 +74,21 @@ void CMyth::Reward()
 
 void CMyth::SpawnCoin()
 {
-	CRCoin* r = dynamic_cast<CRCoin*>(reward);
-	r->Start();
+	coin->Start();
 }
 
 void CMyth::SpawnMushroom()
 {
-	CRMushroom* r = dynamic_cast<CRMushroom*>(reward);
-	r->Start();
+	if (mario->GetState() == MARIO_LEVEL_SMALL)
+	{
+		mushroom->Start();
+		leaf->Delete();
+	}
+	else
+	{
+		leaf->Start();
+		mushroom->Delete();
+	}
 }
 
 void CMyth::Render()

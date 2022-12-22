@@ -118,12 +118,13 @@ class CMario : public CGameObject
 	int level; 
 	int untouchable; 
 	ULONGLONG untouchable_start;
-	BOOLEAN isOnPlatform, isOnPlatformOneWay;
+	BOOLEAN isOnPlatform;
 	int coin; 
 
-	CPlatformOneWay *currentOneWayPlatform;
+	CGameObject * currentPlatform;
 
 	void OnCollisionWithGoomba(LPCOLLISIONEVENT e);
+	void OnCollisionWithKoopas(LPCOLLISIONEVENT e);
 	void OnCollisionWithCoin(LPCOLLISIONEVENT e);
 	void OnCollisionWithPortal(LPCOLLISIONEVENT e);
 
@@ -143,7 +144,6 @@ public:
 		untouchable = 0;
 		untouchable_start = -1;
 		isOnPlatform = false;
-		isOnPlatformOneWay = false;
 		coin = 0;
 		isNoclipping = false;
 	}

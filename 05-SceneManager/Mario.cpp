@@ -5,6 +5,7 @@
 #include "Game.h"
 
 #include "Goomba.h"
+#include "Koopas.h"
 #include "Coin.h"
 #include "Portal.h"
 #include "Platform.h"
@@ -27,45 +28,28 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		untouchable_start = 0;
 		untouchable = 0;
 	}
-	
-	if (!isOnPlatform && vy > 0.07)
+	vector<LPGAMEOBJECT> coObjects2;
+	for (int k = 0; k < coObjects->size(); k++)
 	{
-		CCollision::GetInstance()->Process(this, dt, coObjects);
-	} else if (isOnPlatformOneWay)
-	{
-		vector<LPGAMEOBJECT> coObjects2;
-		for (int k = 0; k < coObjects->size(); k++)
+		CPlatformOneWay* u = dynamic_cast<CPlatformOneWay*>(coObjects->at(k));
+		float ux, uy = 0.0f;
+		if (u) u->GetPosition(ux, uy);
+		if (!u || u == currentPlatform || (u && uy >= y))
 		{
-			CPlatformOneWay *u = dynamic_cast<CPlatformOneWay*>(coObjects->at(k));
-			if (!u || u == currentOneWayPlatform)
-			{
-				coObjects2.push_back(coObjects->at(k));
-			}
+			coObjects2.push_back(coObjects->at(k));
 		}
-		CCollision::GetInstance()->Process(this, dt, &coObjects2);
 	}
-	else {
-		vector<LPGAMEOBJECT> coObjects2;
-		for (int k = 0; k < coObjects->size(); k++)
-		{
-			if (!dynamic_cast<CPlatformOneWay*>(coObjects->at(k)))
-			{
-				coObjects2.push_back(coObjects->at(k));
-			}
-		}
-		CCollision::GetInstance()->Process(this, dt, &coObjects2);
-	}
+	CCollision::GetInstance()->Process(this, dt, &coObjects2);
 
-	string str = to_string(absx()) + "; " + to_string(absy());
-	wstring widestr = std::wstring(str.begin(), str.end());
-	const wchar_t* widecstr = widestr.c_str();
-	DebugOutTitle(widecstr);
+	wstring wstr = to_wstring(absx()) + L"   " + to_wstring(absy());
+	const wchar_t* str = wstr.c_str();
+	DebugOutTitle(str);
 }
 
 void CMario::OnNoCollision(DWORD dt)
 {
 	isOnPlatform = false;
-	isOnPlatformOneWay = false;
+	currentPlatform = NULL;
 	x += vx * dt;
 	y += vy * dt;
 }
@@ -75,13 +59,8 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 	if (e->ny != 0 && e->obj->IsBlocking())
 	{
 		vy = 0;
-		isOnPlatformOneWay = false;
-		if (e->ny < 0) 
-			if (dynamic_cast<CPlatformOneWay*>(e->obj))
-			{
-				isOnPlatform = true;
-				isOnPlatformOneWay = true;
-			} else isOnPlatform = true;
+		isOnPlatform = true;
+		currentPlatform = e->obj;
 	}
 	else 
 	if (e->nx != 0 && e->obj->IsBlocking())
@@ -89,11 +68,6 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		vx = 0;
 	}
 
-	if (dynamic_cast<CPlatformOneWay*>(e->obj))
-	{
-		isOnPlatformOneWay = true;
-		currentOneWayPlatform = dynamic_cast<CPlatformOneWay*>(e->obj);
-	}
 	if (dynamic_cast<CMyth*>(e->obj))
 	{
 		if (e->ny > 0)
@@ -104,6 +78,8 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 	}
 	else if (dynamic_cast<CGoomba*>(e->obj))
 		OnCollisionWithGoomba(e);
+	else if (dynamic_cast<CKoopas*>(e->obj))
+		OnCollisionWithKoopas(e);
 	else if (dynamic_cast<CCoin*>(e->obj))
 		OnCollisionWithCoin(e);
 	else if (dynamic_cast<CPortal*>(e->obj))
@@ -139,6 +115,52 @@ void CMario::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
 					DebugOut(L">>> Mario DIE >>> \n");
 					SetState(MARIO_STATE_DIE);
 				}
+			}
+		}
+	}
+}
+
+void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
+{
+	CKoopas* koopas = dynamic_cast<CKoopas*>(e->obj);
+
+	// jump on top >> kill KOOPAS and deflect a bit 
+	if (e->ny < 0)
+	{
+		if (koopas->GetState() == KOOPAS_STATE_WALKING)
+		{
+			koopas->SetState(KOOPAS_STATE_SHELL);
+			vy = -MARIO_JUMP_DEFLECT_SPEED;
+		} else
+			if (koopas->GetState() == KOOPAS_STATE_SHELL)
+			{
+				koopas->SetState(KOOPAS_STATE_MOVING_SHELL);
+			} else
+				if (koopas->GetState() == KOOPAS_STATE_MOVING_SHELL)
+				{
+					koopas->SetState(KOOPAS_STATE_SHELL);
+				}
+	}
+	else // hit by KOOPAS
+	{
+		if (untouchable == 0)
+		{
+			if (koopas->GetState() != KOOPAS_STATE_SHELL && koopas->GetState() != KOOPAS_STATE_CARRIED)
+			{
+				if (level > MARIO_LEVEL_SMALL)
+				{
+					level = MARIO_LEVEL_SMALL;
+					StartUntouchable();
+				}
+				else
+				{
+					DebugOut(L">>> Mario DIE >>> \n");
+					SetState(MARIO_STATE_DIE);
+				}
+			} else
+			if (this->state == MARIO_STATE_RUNNING_RIGHT || this->state == MARIO_STATE_RUNNING_LEFT)
+			{
+				koopas->SetState(KOOPAS_STATE_CARRIED);
 			}
 		}
 	}

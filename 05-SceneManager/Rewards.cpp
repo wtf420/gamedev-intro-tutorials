@@ -54,8 +54,8 @@ void CRCoin::GetBoundingBox(float& l, float& t, float& r, float& b)
 
 void CRMushroom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	if (y > maxY && ay < 0) vy += ay * dt; else
-		if (y <= maxY && ay < 0)
+	if (y > maxY && vy < 0) vy += ay * dt; else
+		if (y <= maxY && vy < 0)
 		{
 			this->ay = MUSHROOM_GRAVITY;
 			this->ax = 0;
@@ -105,8 +105,9 @@ void CRMushroom::OnCollisionWith(LPCOLLISIONEVENT e)
 
 void CRMushroom::Start()
 {
-	maxvy = -MUSHROOM_UP_SPEED_Y;
-	ay = -MUSHROOM_ACCEL_SPEED_Y;
+	vy = -MUSHROOM_UP_SPEED_Y;
+	maxvy = 0;
+	ay = 0;
 	ax = 0;
 }
 

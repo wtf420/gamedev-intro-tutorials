@@ -7,13 +7,13 @@
 // 
 class CPlatform : public CGameObject
 {
-protected: 
-	int length;				// Unit: cell 
+protected:		// Unit: cell 
 	float cellWidth;
 	float cellHeight;
 	int spriteIdBegin, spriteIdMiddle, spriteIdEnd;
 
-public: 
+public:
+	int length;
 	CPlatform(float x, float y,
 		float cell_width, float cell_height, int length,
 		int sprite_id_begin, int sprite_id_middle, int sprite_id_end) :CGameObject(x, y)
@@ -37,8 +37,9 @@ typedef CPlatform* LPPLATFORM;
 class CPlatform2 : public CGameObject
 {
 protected:
-	float length, height;
+	float height;
 public:
+	float length;
 	CPlatform2(float x, float y,
 		float a, float b ) :CGameObject(x, y)
 	{
@@ -55,8 +56,9 @@ public:
 class CPlatformOneWay : public CGameObject
 {
 protected:
-	float length, height;
+	float height;
 public:
+	float length;
 	CPlatformOneWay(float x, float y,
 		float a, float b) :CGameObject(x, y)
 	{

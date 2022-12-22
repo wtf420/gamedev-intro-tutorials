@@ -1,11 +1,12 @@
 #include "Goomba.h"
+#include "Koopas.h"
+#include "Platform.h"
+#include "Playscene.h"
 
 CGoomba::CGoomba(float x, float y):CGameObject(x, y)
 {
-	this->ax = 0;
-	this->ay = GOOMBA_GRAVITY;
-	die_start = -1;
-	SetState(GOOMBA_STATE_WALKING);
+	mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+	SetState(0);
 }
 
 void CGoomba::GetBoundingBox(float &left, float &top, float &right, float &bottom)
@@ -28,6 +29,8 @@ void CGoomba::GetBoundingBox(float &left, float &top, float &right, float &botto
 
 void CGoomba::OnNoCollision(DWORD dt)
 {
+	currentPlatform = NULL;
+
 	x += vx * dt;
 	y += vy * dt;
 };
@@ -35,7 +38,14 @@ void CGoomba::OnNoCollision(DWORD dt)
 void CGoomba::OnCollisionWith(LPCOLLISIONEVENT e)
 {
 	if (!e->obj->IsBlocking()) return; 
+	if (e->ny <= 0) currentPlatform = e->obj;
 	if (dynamic_cast<CGoomba*>(e->obj)) return; 
+	if (dynamic_cast<CKoopas*>(e->obj))
+	{
+		if (dynamic_cast<CKoopas*>(e->obj)->GetState() == KOOPAS_STATE_MOVING_SHELL)
+			this->SetState(GOOMBA_STATE_DIE);
+		return;
+	}
 
 	if (e->ny != 0 )
 	{
@@ -49,6 +59,21 @@ void CGoomba::OnCollisionWith(LPCOLLISIONEVENT e)
 
 void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
+	if (this->state == 0)
+	{
+		float mx, my;
+		mario->GetPosition(mx, my);
+		if (abs(mx - this->x) <= 300)
+		{
+			this->ax = 0;
+			this->ay = GOOMBA_GRAVITY;
+			die_start = -1;
+			SetState(GOOMBA_STATE_WALKING);
+		}
+
+		return;
+	}
+
 	vy += ay * dt;
 	vx += ax * dt;
 
@@ -58,8 +83,20 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		return;
 	}
 
-	CGameObject::Update(dt, coObjects);
-	CCollision::GetInstance()->Process(this, dt, coObjects);
+	vector<LPGAMEOBJECT> coObjects2;
+	for (int k = 0; k < coObjects->size(); k++)
+	{
+		CPlatformOneWay* u = dynamic_cast<CPlatformOneWay*>(coObjects->at(k));
+		float ux, uy = 0.0f;
+		if (u) u->GetPosition(ux, uy);
+		if (!u || u == currentPlatform || (u && uy >= y))
+		{
+			coObjects2.push_back(coObjects->at(k));
+		}
+	}
+	CGameObject::Update(dt, &coObjects2);
+	CCollision::GetInstance()->Process(this, dt, &coObjects2);
+	
 }
 
 
