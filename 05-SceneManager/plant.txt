@@ -1,0 +1,18 @@
+# id	left	top	right	bottom	texture_id
+[SPRITES]
+
+#TUBE
+80001	5	86	36	117	10
+
+#PLANT
+81001	13	62	28	85	10
+
+#BULLET
+82001	569	121	577	129	20
+82002	581	121	589	129	20
+
+# ani_id	sprite1_id	time1	sprite2_id	time2	...
+[ANIMATIONS]
+8000	80001	1000
+8100	81001	1000
+8200	82001	300	82002	300

@@ -29,7 +29,7 @@ public:
 	CMario* mario;
 	CRCoin* coin;
 	CRMushroom* mushroom;
-	CRMushroom* leaf;
+	CRLeaf* leaf;
 
 	CMyth(float x, float y, int t, CGameObject* m, CGameObject* l);
 	void Interact();

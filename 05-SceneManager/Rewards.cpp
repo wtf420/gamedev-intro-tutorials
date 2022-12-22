@@ -1,22 +1,20 @@
 #include "Rewards.h"
 #include "Debug.h"
+#include <string>
 #include "PlayScene.h"
 
 void CRCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	if (y > maxY && ay < 0) vy += ay * dt; else
-		if (y <= maxY && ay < 0)
-		{
-			y = maxY;
-			maxvy = COIN_UP_SPEED_Y;
-			ay = COIN_ACCEL_SPEED_Y;
-			vy = 0;
-		}
-	if (y < originalY && ay > 0) vy += ay * dt; else
-		if (y >= originalY && ay > 0)
+	//If falling up pass limit
+	if (y <= maxY && vy < 0)
+	{
+		y = maxY;
+		vy = COIN_GRAVITY;
+	}
+	else //If falling down pass limit
+		if (y >= originalY && vy > 0)
 		{
 			y = originalY;
-			ay = 0;
 			vy = 0;
 			CMario* mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
 			mario->AddCoin();
@@ -28,14 +26,13 @@ void CRCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 void CRCoin::Start()
 {
-	maxvy = -COIN_UP_SPEED_Y;
-	ay = -COIN_ACCEL_SPEED_Y;
+	vy = -COIN_UP_SPEED_Y;
 }
 
 void CRCoin::Render()
 {
 	CAnimations* animations = CAnimations::GetInstance();
-	animations->Get(ID_ANI_COIN)->Render(x, y);
+	animations->Get(ID_ANI_REWARD_COIN)->Render(x, y);
 }
 
 void CRCoin::GetBoundingBox(float& l, float& t, float& r, float& b)
@@ -61,7 +58,7 @@ void CRMushroom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			this->ax = 0;
 			vy = 0;
 			vx = -MUSHROOM_WALKING_SPEED;
-			collidable = true;
+			collidable = 1;
 		}
 
 	vy += ay * dt;
@@ -86,12 +83,6 @@ void CRMushroom::OnCollisionWith(LPCOLLISIONEVENT e)
 {
 	if (!e->obj->IsBlocking()) return;
 	if (dynamic_cast<CRMushroom*>(e->obj)) return;
-	if (dynamic_cast<CMario*>(e->obj)) {
-		isDeleted = true;
-		LPGAME game = CGame::GetInstance();
-		CMario* mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
-		mario->OnCollisionWithMushroom();
-	}
 
 	if (e->ny != 0)
 	{
@@ -118,6 +109,64 @@ void CRMushroom::Render()
 }
 
 void CRMushroom::GetBoundingBox(float& l, float& t, float& r, float& b)
+{
+	l = x - COIN_MYTH_BBOX_WIDTH / 2;
+	t = y - COIN_MYTH_BBOX_HEIGHT / 2;
+	r = l + COIN_MYTH_BBOX_WIDTH;
+	b = t + COIN_MYTH_BBOX_HEIGHT;
+}
+
+/*******************************************************************
+							LEAF
+/********************************************************************/
+
+void CRLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+{
+	//If falling right pass limit
+	if (x > maxX && vx > 0)
+	{
+		x = maxX;
+		vx = -LEAF_SPEED_X;
+	}
+	else //If falling left pass limit
+		if (x < originalX && vx < 0)
+		{
+			x = originalX;
+			vx = LEAF_SPEED_X;
+		}
+
+	//If falling up pass limit
+	if (y <= maxY && vy < 0)
+	{
+		vx = LEAF_SPEED_X;
+		y = maxY;
+		vy = LEAF_GRAVITY;
+		collidable = 1;
+	} else //If falling down pass limit
+	if (y >= originalY && vy > 0)
+	{
+		y = originalY;
+		vy = 0;
+		isDeleted = true;
+	}
+
+	x += vx * dt;
+	y += vy * dt;
+}
+
+void CRLeaf::Start()
+{
+	vx = 0;
+	vy = -LEAF_UP_SPEED_Y;
+}
+
+void CRLeaf::Render()
+{
+	CAnimations* animations = CAnimations::GetInstance();
+	animations->Get(ID_ANI_LEAF)->Render(x, y);
+}
+
+void CRLeaf::GetBoundingBox(float& l, float& t, float& r, float& b)
 {
 	l = x - COIN_MYTH_BBOX_WIDTH / 2;
 	t = y - COIN_MYTH_BBOX_HEIGHT / 2;

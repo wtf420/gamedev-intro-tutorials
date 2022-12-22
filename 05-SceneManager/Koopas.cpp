@@ -70,6 +70,11 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			lastvx = 0.0f;
 			SetState(KOOPAS_STATE_WALKING);
 		}
+		else
+		{
+			if (this->state == KOOPAS_STATE_MOVING_SHELL)
+				isDeleted = true;
+		}
 
 		return;
 	}
@@ -89,7 +94,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			x = mx - KOOPAS_BBOX_WIDTH;
 			y = my;
 		}
-		if (mario->GetState() == MARIO_STATE_IDLE)
+		if (!mario->isHolding)
 			this->SetState(KOOPAS_STATE_MOVING_SHELL);
 	}
 	else
@@ -198,6 +203,9 @@ void CKoopas::SetState(int state)
 		vx = 0;
 		vy = 0;
 		ay = 0;
+		break;
+	case KOOPAS_STATE_DIE:
+		isDeleted = true;
 		break;
 	}
 	CGameObject::SetState(state);

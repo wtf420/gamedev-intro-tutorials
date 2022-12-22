@@ -8,6 +8,7 @@ cloud.txt
 background.txt
 myth.txt
 koopas.txt
+plant.txt
 #
 [OBJECTS]
 # type	x	y	extra_settings per object type
@@ -28,6 +29,9 @@ koopas.txt
 
 #KOOPAS
 3	590	50
+
+#Plant
+10	359	139
 
 # COIN
 4 	1071	86
@@ -67,7 +71,7 @@ koopas.txt
 7	231	128	42	50
 7	265	92	45	85
 
-7	392	127	80	70
+7	392	128	80	70
 7	455	92	66	111
 7	502	60	66	140
 7	502	143	99	55
@@ -87,10 +91,10 @@ koopas.txt
 8	416	86
 9 	655	150
 8	703	116
-8	1472	134
+9	1472	134
 
 #Pipes	
-6	346	127	30	50
+6	346	125	30	50
 6	1783	142	30	50
 6	1847	127	30	50
 6	2312	142	30	50

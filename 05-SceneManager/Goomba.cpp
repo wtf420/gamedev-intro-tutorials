@@ -37,15 +37,16 @@ void CGoomba::OnNoCollision(DWORD dt)
 
 void CGoomba::OnCollisionWith(LPCOLLISIONEVENT e)
 {
-	if (!e->obj->IsBlocking()) return; 
-	if (e->ny <= 0) currentPlatform = e->obj;
-	if (dynamic_cast<CGoomba*>(e->obj)) return; 
 	if (dynamic_cast<CKoopas*>(e->obj))
 	{
 		if (dynamic_cast<CKoopas*>(e->obj)->GetState() == KOOPAS_STATE_MOVING_SHELL)
 			this->SetState(GOOMBA_STATE_DIE);
 		return;
 	}
+
+	if (!e->obj->IsBlocking()) return; 
+	if (e->ny <= 0) currentPlatform = e->obj;
+	if (dynamic_cast<CGoomba*>(e->obj)) return; 
 
 	if (e->ny != 0 )
 	{

@@ -18,7 +18,7 @@ CMyth::CMyth(float x, float y, int t, CGameObject* m, CGameObject* l) : CGameObj
 		break;
 		case TYPE_MUSHROOM:
 			mushroom = dynamic_cast<CRMushroom*>(m);
-			leaf = dynamic_cast<CRMushroom*>(l);
+			leaf = dynamic_cast<CRLeaf*>(l);
 		break;
 	}
 }
@@ -79,15 +79,15 @@ void CMyth::SpawnCoin()
 
 void CMyth::SpawnMushroom()
 {
-	if (mario->GetState() == MARIO_LEVEL_SMALL)
+	if (mario->GetLevel() == MARIO_LEVEL_SMALL)
 	{
-		mushroom->Start();
 		leaf->Delete();
+		mushroom->Start();
 	}
 	else
 	{
-		leaf->Start();
 		mushroom->Delete();
+		leaf->Start();
 	}
 }
 

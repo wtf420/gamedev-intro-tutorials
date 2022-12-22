@@ -13,6 +13,7 @@
 #include "Myth.h"
 #include "Rewards.h"
 #include "Koopas.h"
+#include "Plant.h"
 
 #include "SampleKeyEventHandler.h"
 
@@ -147,7 +148,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		m->SetPosition(x, y);
 		objects.push_back(m);
 
-		CRMushroom* m2 = new CRMushroom(x, y);
+		CRLeaf* m2 = new CRLeaf(x, y);
 		m2->SetPosition(x, y);
 		objects.push_back(m2);
 
@@ -200,6 +201,21 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			cell_width, cell_height, length,
 			sprite_begin, sprite_middle, sprite_end
 		);
+
+		break;
+	}
+
+	case OBJECT_TYPE_PLANT:
+	{
+		CPlantPipe* p = new CPlantPipe(x, y);
+		p->SetPosition(x, y);
+		objects.push_back(p);
+
+		CPlantBullet* pb = new CPlantBullet(x, y);
+		pb->SetPosition(x, y);
+		objects.push_back(pb);
+
+		obj = new CPlant(x, y, pb);
 
 		break;
 	}

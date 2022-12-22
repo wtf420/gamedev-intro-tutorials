@@ -9,6 +9,7 @@
 
 #define MARIO_WALKING_SPEED		0.1f
 #define MARIO_RUNNING_SPEED		0.2f
+#define MARIO_MAX_GRAVITY		0.1f
 
 #define MARIO_ACCEL_WALK_X	0.0005f
 #define MARIO_ACCEL_RUN_X	0.0007f
@@ -36,6 +37,7 @@
 #define MARIO_STATE_SIT				600
 #define MARIO_STATE_SIT_RELEASE		601
 
+#define MARIO_STATE_ATTACK			700
 
 #pragma region ANIMATION_ID
 
@@ -81,6 +83,31 @@
 #define ID_ANI_MARIO_SMALL_JUMP_RUN_RIGHT 1600
 #define ID_ANI_MARIO_SMALL_JUMP_RUN_LEFT 1601
 
+// RACCOON MARIO
+#define ID_ANI_MARIO_RACCOON_IDLE_RIGHT 2000
+#define ID_ANI_MARIO_RACCOON_IDLE_LEFT 2002
+
+#define ID_ANI_MARIO_RACCOON_WALKING_RIGHT 2100
+#define ID_ANI_MARIO_RACCOON_WALKING_LEFT 2101
+
+#define ID_ANI_MARIO_RACCOON_RUNNING_RIGHT 2200
+#define ID_ANI_MARIO_RACCOON_RUNNING_LEFT 2201
+
+#define ID_ANI_MARIO_RACCOON_BRACE_RIGHT 2300
+#define ID_ANI_MARIO_RACCOON_BRACE_LEFT 2301
+
+#define ID_ANI_MARIO_RACCOON_JUMP_WALK_RIGHT 2400
+#define ID_ANI_MARIO_RACCOON_JUMP_WALK_LEFT 2401
+
+#define ID_ANI_MARIO_RACCOON_JUMP_RUN_RIGHT 2500
+#define ID_ANI_MARIO_RACCOON_JUMP_RUN_LEFT 2501
+
+#define ID_ANI_MARIO_RACCOON_SIT_LEFT 2600
+#define ID_ANI_MARIO_RACCOON_SIT_RIGHT 2601
+
+#define ID_ANI_MARIO_RACCOON_ATTACK_LEFT 2700
+#define ID_ANI_MARIO_RACCOON_ATTACK_RIGHT 2701
+
 #pragma endregion
 
 #define GROUND_Y 160.0f
@@ -90,8 +117,10 @@
 
 #define	MARIO_LEVEL_SMALL	1
 #define	MARIO_LEVEL_BIG		2
+#define	MARIO_LEVEL_RACCOON		3
 
 #define MARIO_BIG_BBOX_WIDTH  14
+#define MARIO_ATTACK_BBOX_WIDTH  20
 #define MARIO_BIG_BBOX_HEIGHT 24
 #define MARIO_BIG_SITTING_BBOX_WIDTH  14
 #define MARIO_BIG_SITTING_BBOX_HEIGHT 16
@@ -101,8 +130,9 @@
 #define MARIO_SMALL_BBOX_WIDTH  13
 #define MARIO_SMALL_BBOX_HEIGHT 12
 
-
 #define MARIO_UNTOUCHABLE_TIME 2500
+#define MARIO_RACCOONSPAMJUMP_TIME 500
+#define MARIO_ATTACK_TIME 400
 
 class CMario : public CGameObject
 {
@@ -117,7 +147,7 @@ class CMario : public CGameObject
 
 	int level; 
 	int untouchable; 
-	ULONGLONG untouchable_start;
+	ULONGLONG untouchable_start, raccoonSpamJump_start, attack_start;
 	BOOLEAN isOnPlatform;
 	int coin; 
 
@@ -127,11 +157,16 @@ class CMario : public CGameObject
 	void OnCollisionWithKoopas(LPCOLLISIONEVENT e);
 	void OnCollisionWithCoin(LPCOLLISIONEVENT e);
 	void OnCollisionWithPortal(LPCOLLISIONEVENT e);
+	void OnCollisionWithPlant(LPCOLLISIONEVENT e);
+	void OnCollisionWithBullet(LPCOLLISIONEVENT e);
 
 	int GetAniIdBig();
 	int GetAniIdSmall();
+	int GetAniIdRaccoon();
 
 public:
+	int attacking;
+	int isHolding;
 	CMario(float x, float y) : CGameObject(x, y)
 	{
 		isSitting = false;
@@ -143,14 +178,18 @@ public:
 		level = MARIO_LEVEL_SMALL;
 		untouchable = 0;
 		untouchable_start = -1;
+		attacking = 0;
+		attack_start = -1;
 		isOnPlatform = false;
 		coin = 0;
 		isNoclipping = false;
+		isHolding = true;
 	}
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	void Render();
 	void SetState(int state);
-	void OnCollisionWithMushroom();
+	void SetHold(int h);
+	void OnCollisionWithMushroom(LPCOLLISIONEVENT e);
 
 	int IsCollidable()
 	{ 
@@ -164,6 +203,7 @@ public:
 	void OnNoCollision(DWORD dt);
 	void OnCollisionWith(LPCOLLISIONEVENT e);
 
+	int GetLevel() { return level; };
 	void SetLevel(int l);
 	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount64(); }
 

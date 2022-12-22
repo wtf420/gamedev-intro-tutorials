@@ -13,6 +13,12 @@ void CSampleKeyHandler::OnKeyDown(int KeyCode)
 
 	switch (KeyCode)
 	{
+	case DIK_A:
+		if (mario->GetLevel() == MARIO_LEVEL_RACCOON)
+		{
+			mario->SetState(MARIO_STATE_ATTACK);
+		}
+		break;
 	case DIK_DOWN:
 		mario->SetState(MARIO_STATE_SIT);
 		break;
@@ -26,6 +32,9 @@ void CSampleKeyHandler::OnKeyDown(int KeyCode)
 		mario->SetLevel(MARIO_LEVEL_BIG);
 		break;
 	case DIK_3:
+		mario->SetLevel(MARIO_LEVEL_RACCOON);
+		break;
+	case DIK_4:
 		mario->ToggleNoclip();
 		break;
 	case DIK_0:
@@ -57,6 +66,10 @@ void CSampleKeyHandler::KeyState(BYTE *states)
 {
 	LPGAME game = CGame::GetInstance();
 	CMario* mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+
+	if (game->IsKeyDown(DIK_A))
+		mario->SetHold(1); else
+		mario->SetHold(0);
 
 	if (game->IsKeyDown(DIK_RIGHT))
 	{
