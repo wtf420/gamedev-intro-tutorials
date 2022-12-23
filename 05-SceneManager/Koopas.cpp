@@ -194,7 +194,7 @@ void CKoopas::SetState(int state)
 		y -= 1.0f;
 		float mx, my;
 		mario->GetPosition(mx, my);
-		if (mx <= this->x) vx = KOOPAS_SHELL_SPEED;
+		if (mx < this->x) vx = KOOPAS_SHELL_SPEED;
 		else vx = -KOOPAS_SHELL_SPEED;
 		vy = -KOOPAS_GRAVITY;
 		ay = KOOPAS_GRAVITY;

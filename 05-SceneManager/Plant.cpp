@@ -7,13 +7,6 @@ void CPlantPipe::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	Render();
 	CCollision::GetInstance()->Process(this, dt, coObjects);
-
-	std::string stddrivestring = "to_string(a) + "; " + to_string(absy())";
-
-	std::wstring widedrivestring = std::wstring(stddrivestring.begin(), stddrivestring.end());
-
-	const wchar_t* TargetDrive = widedrivestring.c_str();
-	DebugOutTitle(TargetDrive);
 }
 
 void CPlantPipe::Render()
@@ -64,6 +57,8 @@ void CPlant::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				vy = 0;
 			}
 	}
+	else if (CanAttack())
+		plantbullet->Reset2();
 
 	y += vy * dt;
 }
@@ -111,12 +106,6 @@ void CPlant::GetBoundingBox(float& l, float& t, float& r, float& b)
 
 void CPlantBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	std::string stddrivestring = to_string(x) + "; " + to_string(y);
-
-	std::wstring widedrivestring = std::wstring(stddrivestring.begin(), stddrivestring.end());
-
-	const wchar_t* TargetDrive = widedrivestring.c_str();
-	DebugOutTitle(TargetDrive);
 	Render();
 	x += vx * dt;
 	y += vy * dt;
