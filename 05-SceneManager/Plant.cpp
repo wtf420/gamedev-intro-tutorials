@@ -30,6 +30,10 @@ void CPlant::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	if (CanAttack())
 		Attack();
+	if (GetTickCount64() - attacking > PLANT_ATTACK_TIME)
+	{
+		plantbullet->Reset(-100, -100);
+	}
 
 	if (isActive)
 	{
@@ -57,8 +61,6 @@ void CPlant::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				vy = 0;
 			}
 	}
-	else if (CanAttack())
-		plantbullet->Reset2();
 
 	y += vy * dt;
 }

@@ -23,6 +23,18 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 
 	if (abs(vx) > abs(maxVx)) vx = maxVx;
 	
+	if (abs(this->vx) > MARIO_WALKING_SPEED)
+	{
+		power++;
+		if (power > MARIO_POWER_LIMIT)
+			power = MARIO_POWER_LIMIT;
+	}
+	else
+	{
+		power--;
+		if (power < 0)
+			power = 0;
+	}
 
 	// reset untouchable timer if untouchable time has passed
 	if ( GetTickCount64() - untouchable_start > MARIO_UNTOUCHABLE_TIME) 
@@ -53,7 +65,10 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	}
 	CCollision::GetInstance()->Process(this, dt, &coObjects2);
 
-	
+	std::string stddrivestring = to_string(absx()) + " " + to_string(absy());
+	std::wstring widedrivestring = std::wstring(stddrivestring.begin(), stddrivestring.end());
+	const wchar_t* TargetDrive = widedrivestring.c_str();
+	DebugOutTitle(TargetDrive);
 }
 
 void CMario::OnNoCollision(DWORD dt)
@@ -651,6 +666,11 @@ void CMario::SetState(int state)
 			else if (this->level == MARIO_LEVEL_RACCOON)
 			{
 				raccoonSpamJump_start = GetTickCount64();
+				if (power == MARIO_POWER_LIMIT)
+				{
+					ay = 0;
+					vy = -MARIO_JUMP_SPEED_Y / 1.5;
+				}
 			}
 			break;
 

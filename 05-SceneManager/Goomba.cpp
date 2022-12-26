@@ -205,13 +205,6 @@ bool CSuperGoomba::canJump()
 
 void CSuperGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	std::string stddrivestring = to_string(canJump());
-
-	std::wstring widedrivestring = std::wstring(stddrivestring.begin(), stddrivestring.end());
-
-	const wchar_t* TargetDrive = widedrivestring.c_str();
-	DebugOutTitle(TargetDrive);
-
 	if (this->state == 0)
 	{
 		float mx, my;

@@ -133,10 +133,12 @@
 #define MARIO_UNTOUCHABLE_TIME 2500
 #define MARIO_RACCOONSPAMJUMP_TIME 500
 #define MARIO_ATTACK_TIME 400
+#define MARIO_POWER_LIMIT 5
 
 class CMario : public CGameObject
 {
 	BOOLEAN isSitting, isNoclipping;
+	float power;
 	float maxVx;
 	float maxVy;
 	float ax;				// acceleration on x 
@@ -185,6 +187,7 @@ public:
 		coin = 0;
 		isNoclipping = false;
 		isHolding = true;
+		power = 0;
 	}
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	void Render();
