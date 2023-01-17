@@ -77,8 +77,30 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		return;
 	}
 
-	vy += ay * dt;
-	vx += ax * dt;
+	float timeScale;
+	CGame::GetInstance()->GetTimeScale(timeScale);
+	if (timeScale == 0.0f)
+	{
+		if (!timeStopped)
+		{
+			timeStopped = true;
+			lastvx = vx;
+			lastvy = vy;
+		}
+		vx = 0;
+		vy = 0;
+	}
+	else
+	{
+		if (timeStopped)
+		{
+			vx = lastvx;
+			vy = lastvy;
+			timeStopped = false;
+		}
+		vy += ay * dt;
+		vx += ax * dt;
+	}
 
 	if ( (state==GOOMBA_STATE_DIE) && (GetTickCount64() - die_start > GOOMBA_DIE_TIMEOUT) )
 	{
@@ -214,12 +236,12 @@ void CSuperGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			this->ax = 0;
 			this->ay = GOOMBA_GRAVITY;
 			die_start = -1;
-			SetState(GOOMBA_STATE_WALKING);
+			SetState(GOOMBA_STATE_SUPER_WALKING);
 		}
 		return;
 	}
 
-	if (state == GOOMBA_STATE_WALKING && canJump())
+	if (state == GOOMBA_STATE_SUPER_WALKING && canJump())
 	{
 		if (jumpCount < 2)
 		{
@@ -235,8 +257,30 @@ void CSuperGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		}
 	}
 
-	vy += ay * dt;
-	vx += ax * dt;
+	float timeScale;
+	CGame::GetInstance()->GetTimeScale(timeScale);
+	if (timeScale == 0.0f)
+	{
+		if (!timeStopped)
+		{
+			timeStopped = true;
+			lastvx = vx;
+			lastvy = vy;
+		}
+		vx = 0;
+		vy = 0;
+	}
+	else
+	{
+		if (timeStopped)
+		{
+			vx = lastvx;
+			vy = lastvy;
+			timeStopped = false;
+		}
+		vy += ay * dt;
+		vx += ax * dt;
+	}
 
 	if ((state == GOOMBA_STATE_DIE) && (GetTickCount64() - die_start > GOOMBA_DIE_TIMEOUT))
 	{
@@ -264,14 +308,18 @@ void CSuperGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 void CSuperGoomba::Render()
 {
 	int aniId = ID_ANI_GOOMBA_SUPERWALK;
-	if (state == GOOMBA_STATE_DIE)
+	if (state == GOOMBA_STATE_WALKING)
 	{
-		aniId = ID_ANI_GOOMBA_DIE;
+		aniId = ID_ANI_GOOMBA_WALKING;
 	} else
-		if (state == GOOMBA_STATE_FLYING)
+		if (state == GOOMBA_STATE_DIE)
 		{
-			aniId = ID_ANI_GOOMBA_FLY;
-		}
+			aniId = ID_ANI_GOOMBA_DIE;
+		} else
+			if (state == GOOMBA_STATE_FLYING)
+			{
+				aniId = ID_ANI_GOOMBA_FLY;
+			}
 
 	CAnimations::GetInstance()->Get(aniId)->Render(x, y);
 	RenderBoundingBox();
@@ -289,8 +337,13 @@ void CSuperGoomba::SetState(int state)
 		vy = 0;
 		ay = 0;
 		break;
+	case GOOMBA_STATE_SUPER_WALKING:
+	{
+		vx = -GOOMBA_WALKING_SPEED / 2;
+	}
 	case GOOMBA_STATE_WALKING:
-		vx = -GOOMBA_WALKING_SPEED;
+		vx = GOOMBA_WALKING_SPEED * (vx / abs(vx));
+		y -= 1;
 		break;
 	case GOOMBA_STATE_FLYING:
 		break;

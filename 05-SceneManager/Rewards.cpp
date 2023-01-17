@@ -64,12 +64,24 @@ void CRMushroom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	vy += ay * dt;
 	vx += ax * dt;
 
-	CGameObject::Update(dt, coObjects);
-	CCollision::GetInstance()->Process(this, dt, coObjects);
+	vector<LPGAMEOBJECT> coObjects2;
+	for (int k = 0; k < coObjects->size(); k++)
+	{
+		CPlatformOneWay* u = dynamic_cast<CPlatformOneWay*>(coObjects->at(k));
+		float ux, uy = 0.0f;
+		if (u) u->GetPosition(ux, uy);
+		if (!u || u == currentPlatform || (u && uy >= y))
+		{
+			coObjects2.push_back(coObjects->at(k));
+		}
+	}
+	CGameObject::Update(dt, &coObjects2);
+	CCollision::GetInstance()->Process(this, dt, &coObjects2);
 }
 
 void CRMushroom::OnNoCollision(DWORD dt)
 {
+	currentPlatform = NULL;
 	x += vx * dt;
 	y += vy * dt;
 };
@@ -83,6 +95,7 @@ void CRMushroom::OnCollisionWith(LPCOLLISIONEVENT e)
 {
 	if (!e->obj->IsBlocking()) return;
 	if (dynamic_cast<CRMushroom*>(e->obj)) return;
+	if (e->ny <= 0) currentPlatform = e->obj;
 
 	if (e->ny != 0)
 	{

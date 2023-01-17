@@ -24,10 +24,14 @@ protected:
 	float vx;
 	float vy;
 
+	float lastvx;
+	float lastvy;
+
 	int nx;	 
 
 	int state;
 
+	bool timeStopped;
 	bool isDeleted; 
 
 public: 

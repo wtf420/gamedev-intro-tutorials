@@ -99,8 +99,30 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	else
 	{
-		vy += ay * dt;
-		vx += ax * dt;
+		float timeScale;
+		CGame::GetInstance()->GetTimeScale(timeScale);
+		if (timeScale == 0.0f)
+		{
+			if (!timeStopped)
+			{
+				timeStopped = true;
+				lastvx = vx;
+				lastvy = vy;
+			}
+			vx = 0;
+			vy = 0;
+		}
+		else
+		{
+			if (timeStopped)
+			{
+				vx = lastvx;
+				vy = lastvy;
+				timeStopped = false;
+			}
+			vy += ay * dt;
+			vx += ax * dt;
+		}
 
 		if (state == KOOPAS_STATE_WALKING && currentPlatform)
 		{
@@ -179,14 +201,15 @@ void CKoopas::SetState(int state)
 		{
 			y += (KOOPAS_BBOX_HEIGHT - KOOPAS_BBOX_HEIGHT_SHELL) / 2;
 		}
+		y -= 1;
 		vx = 0;
 		vy = 0;
 		ay = 0;
 		break;
 	case KOOPAS_STATE_WALKING:
 		y -= (KOOPAS_BBOX_HEIGHT - KOOPAS_BBOX_HEIGHT_SHELL) / 2 + 1.0f;
-		if (lastvx != 0) vx = lastvx;
-		else vx = -KOOPAS_WALKING_SPEED;
+		vx = 0;
+		vx = -KOOPAS_WALKING_SPEED;
 		vy = -KOOPAS_GRAVITY;
 		ay = KOOPAS_GRAVITY;
 		break;

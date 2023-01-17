@@ -30,7 +30,7 @@ void CPlant::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	if (CanAttack())
 		Attack();
-	if (GetTickCount64() - attacking > PLANT_ATTACK_TIME)
+	if (GetTickCount64() - lastattack > ID_ANI_PLANT_BULLET_ALIVE_TIME && !isActive)
 	{
 		plantbullet->Reset(-100, -100);
 	}
@@ -109,6 +109,29 @@ void CPlant::GetBoundingBox(float& l, float& t, float& r, float& b)
 void CPlantBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	Render();
+	float timeScale;
+	CGame::GetInstance()->GetTimeScale(timeScale);
+	if (timeScale == 0.0f)
+	{
+		if (!timeStopped)
+		{
+			timeStopped = true;
+			lastvx = vx;
+			lastvy = vy;
+		}
+		vx = 0;
+		vy = 0;
+	}
+	else
+	{
+		if (timeStopped)
+		{
+			vx = lastvx;
+			vy = lastvy;
+			timeStopped = false;
+		}
+	}
+
 	x += vx * dt;
 	y += vy * dt;
 	CCollision::GetInstance()->Process(this, dt, coObjects);

@@ -47,6 +47,7 @@ class CGame
 
 	float cam_x = 0.0f;
 	float cam_y = 0.0f;
+	float timeScale = 1.0f;
 
 	HINSTANCE hInstance;
 
@@ -60,6 +61,8 @@ class CGame
 	void _ParseSection_SCENES(string line);
 
 public:
+	bool DrawBoundingBox = false;
+
 	// Init DirectX, Sprite Handler
 	void Init(HWND hWnd, HINSTANCE hInstance);
 
@@ -105,6 +108,9 @@ public:
 
 	void SetCamPos(float x, float y) { cam_x = x; cam_y = y; }
 	void GetCamPos(float& x, float& y) { x = cam_x; y = cam_y; }
+
+	void SetTimeScale(float x) { timeScale = x; }
+	void GetTimeScale(float& x) { x = timeScale; }
 
 	LPSCENE GetCurrentScene() { return scenes[current_scene]; }
 	void Load(LPCWSTR gameFile);

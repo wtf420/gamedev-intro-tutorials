@@ -23,13 +23,13 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 
 	if (abs(vx) > abs(maxVx)) vx = maxVx;
 	
-	if (abs(this->vx) > MARIO_WALKING_SPEED)
+	if (abs(this->vx) > MARIO_WALKING_SPEED && isOnPlatform)
 	{
 		power++;
 		if (power > MARIO_POWER_LIMIT)
 			power = MARIO_POWER_LIMIT;
 	}
-	else
+	else if (isOnPlatform)
 	{
 		power--;
 		if (power < 0)
@@ -65,7 +65,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	}
 	CCollision::GetInstance()->Process(this, dt, &coObjects2);
 
-	std::string stddrivestring = to_string(absx()) + " " + to_string(absy());
+	float timeScale;
+	CGame::GetInstance()->GetTimeScale(timeScale);
+	std::string stddrivestring = to_string(timeScale);
 	std::wstring widedrivestring = std::wstring(stddrivestring.begin(), stddrivestring.end());
 	const wchar_t* TargetDrive = widedrivestring.c_str();
 	DebugOutTitle(TargetDrive);
@@ -170,6 +172,11 @@ void CMario::OnCollisionWithSuperGoomba(LPCOLLISIONEVENT e)
 	// jump on top >> kill Goomba and deflect a bit 
 	if (e->ny < 0)
 	{
+		if (goomba->GetState() == GOOMBA_STATE_SUPER_WALKING)
+		{
+			goomba->SetState(GOOMBA_STATE_WALKING);
+			vy = -MARIO_JUMP_DEFLECT_SPEED;
+		} else
 		if (goomba->GetState() != GOOMBA_STATE_DIE)
 		{
 			goomba->SetState(GOOMBA_STATE_DIE);
@@ -486,9 +493,13 @@ int CMario::GetAniIdBig()
 
 int CMario::GetAniIdRaccoon()
 {
+	float timeScale = 1.0f;
+	CGame::GetInstance()->SetTimeScale(timeScale);
 	int aniId = -1;
 	if (attacking)
 	{
+		timeScale = 0.0f;
+		CGame::GetInstance()->SetTimeScale(timeScale);
 		if (nx >= 0)
 			aniId = ID_ANI_MARIO_RACCOON_ATTACK_RIGHT;
 		else

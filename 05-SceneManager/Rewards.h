@@ -64,6 +64,7 @@ public:
 	int collidable;
 	float originalY, maxY, maxvy;
 	float ax, ay;				// acceleration on y
+	CGameObject* currentPlatform;
 
 	CRMushroom(float x, float y) : CGameObject(x, y) {
 		originalY = y;
@@ -72,6 +73,7 @@ public:
 		ax = 0;
 		ay = 0;
 		collidable = 0;
+		currentPlatform = NULL;
 	}
 
 	virtual int IsCollidable() { return collidable; };

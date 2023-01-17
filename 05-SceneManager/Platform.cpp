@@ -25,6 +25,7 @@ void CPlatform::RenderBoundingBox()
 
 	float xx = x - this->cellWidth / 2 + rect.right / 2;
 
+	if (CGame::GetInstance()->DrawBoundingBox == true)
 	CGame::GetInstance()->Draw(xx - cx, y - cy, bbox, nullptr, BBOX_ALPHA, rect.right - 1, rect.bottom - 1);
 }
 
@@ -88,7 +89,7 @@ void CPlatform2::RenderBoundingBox()
 
 	float cx, cy;
 	CGame::GetInstance()->GetCamPos(cx, cy);
-
+	if (CGame::GetInstance()->DrawBoundingBox == true)
 	CGame::GetInstance()->Draw(x + length / 2 - cx, y + height / 2 - cy, bbox, &rect, BBOX_ALPHA);
 }
 
@@ -124,6 +125,6 @@ void CPlatformOneWay::RenderBoundingBox()
 
 	float cx, cy;
 	CGame::GetInstance()->GetCamPos(cx, cy);
-
+	if (CGame::GetInstance()->DrawBoundingBox == true)
 	CGame::GetInstance()->Draw(x + length / 2 - cx, y + height / 2 - cy, bbox, &rect, BBOX_ALPHA);
 }
