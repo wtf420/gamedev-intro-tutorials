@@ -14,6 +14,7 @@
 #include "Rewards.h"
 #include "Koopas.h"
 #include "Plant.h"
+#include "hud.h"
 
 #include "SampleKeyEventHandler.h"
 
@@ -251,7 +252,6 @@ void CPlayScene::LoadAssets(LPCWSTR assetFile)
 	f.open(assetFile);
 
 	int section = ASSETS_SECTION_UNKNOWN;
-
 	char str[MAX_SCENE_LINE];
 	while (f.getline(str, MAX_SCENE_LINE))
 	{
@@ -272,7 +272,6 @@ void CPlayScene::LoadAssets(LPCWSTR assetFile)
 		case ASSETS_SECTION_ANIMATIONS: _ParseSection_ANIMATIONS(line); break;
 		}
 	}
-
 	f.close();
 
 	DebugOut(L"[INFO] Done loading assets from %s\n", assetFile);
@@ -307,7 +306,9 @@ void CPlayScene::Load()
 			case SCENE_SECTION_OBJECTS: _ParseSection_OBJECTS(line); break;
 		}
 	}
-
+	CHud* hud = new CHud(100.0f, 100.0f);
+	objects.push_back(hud);
+	this->hud = hud;
 	f.close();
 
 	DebugOut(L"[INFO] Done loading scene  %s\n", sceneFilePath);
@@ -352,6 +353,7 @@ void CPlayScene::Update(DWORD dt)
 	if (abs(cyy - cy) < 10) cyy = cy;
 
 	CGame::GetInstance()->SetCamPos(cx, cyy);
+	this->hud->SetPosition(cx + 76.0f, cyy + 190.0f);
 	PurgeDeletedObjects();
 }
 
