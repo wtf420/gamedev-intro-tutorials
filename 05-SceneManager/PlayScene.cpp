@@ -345,7 +345,7 @@ void CPlayScene::Update(DWORD dt)
 
 	if (cx < 0) cx = 0;
 	if (cy < -200) cy = -200; else
-	if (cy > -50) cy = 0;
+	if (cy > -50) cy = 20;
 	if (cy > cyy)
 		cyy += 10;
 	if (cy < cyy)
@@ -353,7 +353,7 @@ void CPlayScene::Update(DWORD dt)
 	if (abs(cyy - cy) < 10) cyy = cy;
 
 	CGame::GetInstance()->SetCamPos(cx, cyy);
-	this->hud->SetPosition(cx + 76.0f, cyy + 190.0f);
+	this->hud->SetPosition(cx + 76.0f, cyy + (game->GetBackBufferHeight() - 28.0f / 2));
 	PurgeDeletedObjects();
 }
 
