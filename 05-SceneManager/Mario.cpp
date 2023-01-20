@@ -113,6 +113,8 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithSuperGoomba(e);
 	else if (dynamic_cast<CKoopas*>(e->obj))
 		OnCollisionWithKoopas(e);
+	else if (dynamic_cast<CSuperKoopas*>(e->obj))
+		OnCollisionWithSuperKoopas(e);
 	else if (dynamic_cast<CCoin*>(e->obj))
 		OnCollisionWithCoin(e);
 	else if (dynamic_cast<CRLeaf*>(e->obj) || dynamic_cast<CRMushroom*>(e->obj))
@@ -268,6 +270,61 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 				koopas->SetState(KOOPAS_STATE_CARRIED);
 			}
 		}
+	}
+}
+
+void CMario::OnCollisionWithSuperKoopas(LPCOLLISIONEVENT e)
+{
+	CSuperKoopas* Koopas = dynamic_cast<CSuperKoopas*>(e->obj);
+
+	// jump on top >> kill Koopas and deflect a bit 
+	if (e->ny < 0)
+	{
+		if (Koopas->GetState() == KOOPAS_STATE_FLYING)
+		{
+			Koopas->SetState(KOOPAS_STATE_WALKING);
+			vy = -MARIO_JUMP_DEFLECT_SPEED;
+		}
+		else
+			if (Koopas->GetState() == KOOPAS_STATE_SHELL)
+			{
+				Koopas->SetState(KOOPAS_STATE_MOVING_SHELL);
+			}
+			else
+				if (Koopas->GetState() == KOOPAS_STATE_MOVING_SHELL)
+				{
+					Koopas->SetState(KOOPAS_STATE_SHELL);
+				}
+	}
+	else // hit by Koopas
+	{
+		if (attacking)
+		{
+			if (Koopas->GetState() != KOOPAS_STATE_DIE) Koopas->SetState(KOOPAS_STATE_DIE);
+		}
+		else
+			if (untouchable == 0)
+			{
+				if (Koopas->GetState() != KOOPAS_STATE_DIE)
+				{
+					if (level == MARIO_LEVEL_RACCOON)
+					{
+						level = MARIO_LEVEL_BIG;
+						StartUntouchable();
+					}
+					else
+						if (level == MARIO_LEVEL_BIG)
+						{
+							level = MARIO_LEVEL_SMALL;
+							StartUntouchable();
+						}
+						else
+						{
+							DebugOut(L">>> Mario DIE >>> \n");
+							SetState(MARIO_STATE_DIE);
+						}
+				}
+			}
 	}
 }
 
