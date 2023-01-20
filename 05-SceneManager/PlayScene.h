@@ -35,7 +35,8 @@ public:
 	virtual void Unload();
 
 	LPGAMEOBJECT GetPlayer() { return player; }
-
+	
+	bool IsGameObjectInCamera(LPGAMEOBJECT obj);
 	void Clear();
 	void PurgeDeletedObjects();
 

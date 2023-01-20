@@ -8,7 +8,11 @@
 CGoomba::CGoomba(float x, float y):CGameObject(x, y)
 {
 	mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
-	SetState(0);
+
+	this->ax = 0;
+	this->ay = GOOMBA_GRAVITY;
+	die_start = -1;
+	SetState(GOOMBA_STATE_WALKING);
 }
 
 void CGoomba::GetBoundingBox(float &left, float &top, float &right, float &bottom)
@@ -62,21 +66,6 @@ void CGoomba::OnCollisionWith(LPCOLLISIONEVENT e)
 
 void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
-	if (this->state == 0)
-	{
-		float mx, my;
-		mario->GetPosition(mx, my);
-		if (abs(mx - this->x) <= 300)
-		{
-			this->ax = 0;
-			this->ay = GOOMBA_GRAVITY;
-			die_start = -1;
-			SetState(GOOMBA_STATE_WALKING);
-		}
-
-		return;
-	}
-
 	float timeScale;
 	CGame::GetInstance()->GetTimeScale(timeScale);
 	if (timeScale == 0.0f)
@@ -159,9 +148,10 @@ void CGoomba::SetState(int state)
 CSuperGoomba::CSuperGoomba(float x, float y) :CGameObject(x, y)
 {
 	mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
-	SetState(0);
-	jump_start = -1;
-	jumpCount = 0;
+	this->ax = 0;
+	this->ay = GOOMBA_GRAVITY;
+	die_start = -1;
+	SetState(GOOMBA_STATE_SUPER_WALKING);
 }
 
 void CSuperGoomba::GetBoundingBox(float& left, float& top, float& right, float& bottom)
@@ -207,7 +197,7 @@ void CSuperGoomba::OnCollisionWith(LPCOLLISIONEVENT e)
 	if (e->ny != 0)
 	{
 		if (state == GOOMBA_STATE_FLYING)
-			state = GOOMBA_STATE_WALKING;
+			state = GOOMBA_STATE_SUPER_WALKING;
 		vy = 0;
 	}
 	else if (e->nx != 0)
@@ -227,19 +217,6 @@ bool CSuperGoomba::canJump()
 
 void CSuperGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	if (this->state == 0)
-	{
-		float mx, my;
-		mario->GetPosition(mx, my);
-		if (abs(mx - this->x) <= 300)
-		{
-			this->ax = 0;
-			this->ay = GOOMBA_GRAVITY;
-			die_start = -1;
-			SetState(GOOMBA_STATE_SUPER_WALKING);
-		}
-		return;
-	}
 
 	if (state == GOOMBA_STATE_SUPER_WALKING && canJump())
 	{

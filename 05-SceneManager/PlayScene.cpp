@@ -327,7 +327,8 @@ void CPlayScene::Update(DWORD dt)
 
 	for (size_t i = 0; i < objects.size(); i++)
 	{
-		objects[i]->Update(dt, &coObjects);
+		if (IsGameObjectInCamera(objects[i]))
+			objects[i]->Update(dt, &coObjects);
 	}
 
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
@@ -360,7 +361,8 @@ void CPlayScene::Update(DWORD dt)
 void CPlayScene::Render()
 {
 	for (int i = 0; i < objects.size(); i++)
-		objects[i]->Render();
+		if (IsGameObjectInCamera(objects[i]))
+			objects[i]->Render();
 }
 
 /*
@@ -394,6 +396,21 @@ void CPlayScene::Unload()
 }
 
 bool CPlayScene::IsGameObjectDeleted(const LPGAMEOBJECT& o) { return o == NULL; }
+
+bool CPlayScene::IsGameObjectInCamera(LPGAMEOBJECT obj) { 
+	float l, t, r, b;
+	obj->GetBoundingBox(l, t, r, b);
+	float cx, cy;
+	CGame::GetInstance()->GetCamPos(cx, cy);
+
+	float w = CGame::GetInstance()->GetBackBufferWidth() / 2;
+	float h = CGame::GetInstance()->GetBackBufferWidth() / 2;
+	cx += w;
+	cy += h;
+	if ((l > cx + w) || (t > cy + w) || (r < cx - w) || (b < cy - w))
+		return false;
+	return true;
+}
 
 void CPlayScene::PurgeDeletedObjects()
 {
