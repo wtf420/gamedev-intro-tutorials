@@ -5,8 +5,8 @@ void CHud::Render()
 	LPSPRITE hudsprite = CSprites::GetInstance()->Get(ID_SPRITE_HUD);
 	hudsprite->Draw(x, y);
 
-	int l = x - HUD_BBOX_WIDTH / 2;
-	int t = y - HUD_BBOX_HEIGHT / 2;
+	float l = x - HUD_BBOX_WIDTH / 2.0f;
+	float t = y - HUD_BBOX_HEIGHT / 2.0f;
 
 	RenderNumber(l + 38.0f, t + 8.0f, worldId, 1);
 	RenderNumber(l + 30.0f, t + 16.0f, livesCount, 2);

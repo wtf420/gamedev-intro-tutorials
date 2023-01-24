@@ -1,0 +1,15 @@
+# id	left	top	right	bottom	texture_id
+[SPRITES]
+
+#small platform
+50011	0	64	15	81	50
+50012	18	64	33	81	50
+50013	37	64	52	81	50
+
+#big platform
+50021	0	82	31	113	50
+50022	34	82	65	113	50
+50023	69	82	100	113	50
+
+# ani_id	sprite1_id	time1	sprite2_id	time2	...
+[ANIMATIONS]

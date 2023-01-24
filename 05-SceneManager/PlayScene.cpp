@@ -112,9 +112,12 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	switch (object_type)
 	{
 	case OBJECT_TYPE_BACKGROUND:
-		obj = new CBackground(x,y);
+	{
+		float k = (float)atof(tokens[3].c_str());
+		obj = new CBackground(x, y, k);
 		DebugOut(L"[INFO] Background has been created!\n");
 		break;
+	}
 	case OBJECT_TYPE_MARIO:
 		if (player!=NULL) 
 		{
@@ -308,7 +311,6 @@ void CPlayScene::Load()
 		}
 	}
 	CHud* hud = new CHud(100.0f, 100.0f);
-	objects.push_back(hud);
 	this->hud = hud;
 	f.close();
 
@@ -331,6 +333,7 @@ void CPlayScene::Update(DWORD dt)
 		if (IsGameObjectInCamera(objects[i]))
 			objects[i]->Update(dt, &coObjects);
 	}
+	this->hud->Update(dt, &coObjects);
 
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
 	if (player == NULL) return; 
@@ -361,9 +364,15 @@ void CPlayScene::Update(DWORD dt)
 
 void CPlayScene::Render()
 {
+	if (CGame::GetInstance()->DrawBoundingBox == true)
+	{
+		LPSPRITE sprite = CSprites::GetInstance()->Get(100000);
+		sprite->Draw(1400, 88);
+	}
 	for (int i = 0; i < objects.size(); i++)
 		if (IsGameObjectInCamera(objects[i]))
 			objects[i]->Render();
+	this->hud->Render();
 }
 
 /*
@@ -404,8 +413,8 @@ bool CPlayScene::IsGameObjectInCamera(LPGAMEOBJECT obj) {
 	float cx, cy;
 	CGame::GetInstance()->GetCamPos(cx, cy);
 
-	float w = CGame::GetInstance()->GetBackBufferWidth() / 2;
-	float h = CGame::GetInstance()->GetBackBufferWidth() / 2;
+	float w = CGame::GetInstance()->GetBackBufferWidth() / 2.0f;
+	float h = CGame::GetInstance()->GetBackBufferWidth() / 2.0f;
 	cx += w;
 	cy += h;
 	if ((l > cx + w) || (t > cy + w) || (r < cx - w) || (b < cy - w))

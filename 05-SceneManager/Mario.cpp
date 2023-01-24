@@ -737,7 +737,7 @@ void CMario::SetState(int state)
 				if (power == MARIO_POWER_LIMIT)
 				{
 					ay = 0;
-					vy = -MARIO_JUMP_SPEED_Y / 1.5;
+					vy = -MARIO_JUMP_SPEED_Y / 1.5f;
 				}
 			}
 			break;

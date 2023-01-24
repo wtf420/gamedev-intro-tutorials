@@ -1,0 +1,37 @@
+# list of object assets to load in this scene
+[ASSETS]
+mario.txt
+brick.txt
+coin.txt
+goomba.txt
+platform.txt
+background.txt
+myth.txt
+koopas.txt
+plant.txt
+hud.txt
+#
+[OBJECTS]
+# type	x	y	extra_settings per object type
+# type: 0 = Mario , 1 = Brick, 2 = Goomba, 3 = Koopas
+# See OBJECT_TYPE constants in AssetIDs.h
+
+# BACKGROUND
+#100	1400	88	100000
+100	72	160	100001
+100	872	142	100003
+100	967	150	100002
+
+# MARIO
+0	50	20
+#ID	left 	top 	length	height
+#GroundPlatform
+5	0	200	16	15	39	50011	50012	50013
+5	632	190	32	31	14	50021	50022	50023
+5	1136	200	16	15	22	50011	50012	50013
+5	1520	200	16	15	5	50011	50012	50013
+5	1648	200	16	15	36	50011	50012	50013
+5	2240	200	16	15	35	50011	50012	50013
+
+#Portal 
+50	2685	105	2712	124	1

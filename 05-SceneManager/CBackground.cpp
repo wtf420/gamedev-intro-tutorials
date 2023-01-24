@@ -2,8 +2,8 @@
 
 void CBackground::Render()
 {
-	CAnimations* animations = CAnimations::GetInstance();
-	animations->Get(ID_ANI_BACKGROUND)->Render(x, y);
+	LPSPRITE sprite = CSprites::GetInstance()->Get(SpriteID);
+	sprite->Draw(x, y);
 
 	//RenderBoundingBox();
 }
