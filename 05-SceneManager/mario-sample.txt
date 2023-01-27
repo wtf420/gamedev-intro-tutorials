@@ -1,7 +1,7 @@
 [SETTINGS]
 start	1
-width	320
-height	320
+width	720
+height	720
 
 #id	type	file
 # type: 0: intro, 1: play scene 
@@ -16,9 +16,11 @@ height	320
 # id	file 
 [TEXTURES]
 -100	textures\bbox.png
+-10	textures\UIbackground.png
 0	textures\mario.png
 10	textures\enemies.png
 20	textures\misc.png
 30	textures\Untitled.png
-40	textures\hud.png
+40	textures\hud-2.png
 50	textures\background 1-1.png
+60	textures\endstage.png

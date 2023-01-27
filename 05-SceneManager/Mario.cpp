@@ -65,9 +65,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	}
 	CCollision::GetInstance()->Process(this, dt, &coObjects2);
 
-	float timeScale;
-	CGame::GetInstance()->GetTimeScale(timeScale);
-	std::string stddrivestring = to_string(timeScale);
+	std::string stddrivestring = to_string(this->x) + " | " + to_string(this->y);
 	std::wstring widedrivestring = std::wstring(stddrivestring.begin(), stddrivestring.end());
 	const wchar_t* TargetDrive = widedrivestring.c_str();
 	DebugOutTitle(TargetDrive);
@@ -743,7 +741,7 @@ void CMario::SetState(int state)
 			break;
 
 		case MARIO_STATE_RELEASE_JUMP:
-			if (vy < 0) vy += MARIO_JUMP_SPEED_Y / 4;
+			if (vy < 0) vy = vy /2;
 			break;
 
 		case MARIO_STATE_SIT:

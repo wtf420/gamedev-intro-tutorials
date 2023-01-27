@@ -2,11 +2,19 @@
 
 void CHud::Render()
 {
-	LPSPRITE hudsprite = CSprites::GetInstance()->Get(ID_SPRITE_HUD);
-	hudsprite->Draw(x, y);
-
 	float l = x - HUD_BBOX_WIDTH / 2.0f;
 	float t = y - HUD_BBOX_HEIGHT / 2.0f;
+
+	LPTEXTURE back = CTextures::GetInstance()->Get(ID_TEX_BACKGROUND);
+	CGame::GetInstance()->Draw(
+		CGame::GetInstance()->GetBackBufferWidth() / 2 + 1,
+		CGame::GetInstance()->GetBackBufferHeight() - (HUD_BBOX_HEIGHT + 25.0f) / 2.0f,
+		back, nullptr, 1.0f,
+		CGame::GetInstance()->GetBackBufferWidth(), 
+		HUD_BBOX_HEIGHT + 25);
+
+	LPSPRITE hudsprite = CSprites::GetInstance()->Get(ID_SPRITE_HUD);
+	hudsprite->Draw(x, y);
 
 	RenderNumber(l + 38.0f, t + 8.0f, worldId, 1);
 	RenderNumber(l + 30.0f, t + 16.0f, livesCount, 2);

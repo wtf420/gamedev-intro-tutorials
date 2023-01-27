@@ -115,7 +115,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	{
 		float k = (float)atof(tokens[3].c_str());
 		obj = new CBackground(x, y, k);
-		DebugOut(L"[INFO] Background has been created!\n");
+		DebugOut(L"[INFO] Background has been created: %f\n", k);
 		break;
 	}
 	case OBJECT_TYPE_MARIO:
@@ -320,7 +320,7 @@ void CPlayScene::Load()
 void CPlayScene::Update(DWORD dt)
 {
 	// We know that Mario is the first object in the list hence we won't add him into the colliable object list
-	// TO-DO: This is a "dirty" way, need a more organized way 
+	// TO-DO: This is a "dirty" way, need a more organized way
 
 	vector<LPGAMEOBJECT> coObjects;
 	for (size_t i = 1; i < objects.size(); i++)
@@ -328,12 +328,17 @@ void CPlayScene::Update(DWORD dt)
 		coObjects.push_back(objects[i]);
 	}
 
+	this->player->Update(dt, &coObjects);
 	for (size_t i = 0; i < objects.size(); i++)
 	{
-		if (IsGameObjectInCamera(objects[i]))
+		if (IsGameObjectInCamera(objects[i]) && (this->player != objects[i]))
 			objects[i]->Update(dt, &coObjects);
 	}
-	this->hud->Update(dt, &coObjects);
+	if (dynamic_cast<CHud*>(this->hud))
+	{
+		CHud* h = dynamic_cast<CHud*>(this->hud);
+		h->Update(dt);
+	}
 
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
 	if (player == NULL) return; 
@@ -350,7 +355,7 @@ void CPlayScene::Update(DWORD dt)
 
 	if (cx < 0) cx = 0;
 	if (cy < -200) cy = -200; else
-	if (cy > -50) cy = 20;
+	if (cy > -50) cy = 0;
 	if (cy > cyy)
 		cyy += 10;
 	if (cy < cyy)
@@ -358,7 +363,7 @@ void CPlayScene::Update(DWORD dt)
 	if (abs(cyy - cy) < 10) cyy = cy;
 
 	CGame::GetInstance()->SetCamPos(cx, cyy);
-	this->hud->SetPosition(cx + 76.0f, cyy + (game->GetBackBufferHeight() - 28.0f / 2));
+	this->hud->SetPosition(cx + 76.0f + 10.0f, cyy + (game->GetBackBufferHeight() - 28.0f / 2) - 20.0f);
 	PurgeDeletedObjects();
 }
 
