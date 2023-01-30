@@ -163,6 +163,8 @@ class CMario : public CGameObject
 	void OnCollisionWithPortal(LPCOLLISIONEVENT e);
 	void OnCollisionWithPlant(LPCOLLISIONEVENT e);
 	void OnCollisionWithBullet(LPCOLLISIONEVENT e);
+	void OnCollisionWithPowerBlock(LPCOLLISIONEVENT e);
+	void OnCollisionWithMushroom(LPCOLLISIONEVENT e);
 
 	int GetAniIdBig();
 	int GetAniIdSmall();
@@ -194,7 +196,7 @@ public:
 	void Render();
 	void SetState(int state);
 	void SetHold(int h);
-	void OnCollisionWithMushroom(LPCOLLISIONEVENT e);
+	vector<LPGAMEOBJECT>* Attack(float rangeX, float rangeY);
 
 	int IsCollidable()
 	{ 
@@ -204,11 +206,6 @@ public:
 	int IsMaxPower()
 	{
 		return (power >= MARIO_POWER_LIMIT);
-	}
-
-	int IsFlying()
-	{
-		return (state != MARIO_STATE_DIE);
 	}
 
 	int IsBlocking() { return (state != MARIO_STATE_DIE && untouchable==0); }

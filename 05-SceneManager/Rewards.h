@@ -34,6 +34,9 @@
 #define LEAF_SPEED_X 0.05f
 #define LEAF_MAX_X 36.0f
 
+#define ID_ANI_POWERBLOCK 68000
+#define ID_POWERBLOCK_DIED 62004
+
 #define MUSHROOM_GRAVITY 0.002f
 #define MUSHROOM_WALKING_SPEED 0.05f
 
@@ -109,5 +112,26 @@ public:
 	void Start();
 	void Render();
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
+	void GetBoundingBox(float& l, float& t, float& r, float& b);
+};
+
+//************************************
+class PowerBlock : public CGameObject {
+public:
+	int collidable;
+
+	PowerBlock(float x, float y) : CGameObject(x, y) {
+		collidable = 1;
+	}
+
+	virtual int IsBlocking() { return collidable; }
+	virtual int IsCollidable() { return collidable; };
+	void Start()
+	{
+		y = y + 8 - 3;
+		collidable = 0;
+	}
+	void Render();
+	void Update(DWORD dt) {}
 	void GetBoundingBox(float& l, float& t, float& r, float& b);
 };

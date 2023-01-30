@@ -136,6 +136,8 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_KOOPAS: obj = new CKoopas(x, y); break;
 	case OBJECT_TYPE_SUPER_KOOPAS: obj = new CSuperKoopas(x, y); break;
 	case OBJECT_TYPE_BRICK: obj = new CBrick(x,y); break;
+	case OBJECT_TYPE_BRICK_WITH_COIN: obj = new CBrickWithCoin(x, y); break;
+	case OBJECT_TYPE_BRICK_WITH_POWER: obj = new CBrickWithP(x, y); break;
 	case OBJECT_TYPE_COIN: obj = new CCoin(x, y); break;
 	case OBJECT_TYPE_MYTH_COIN:
 	{
@@ -415,6 +417,11 @@ void CPlayScene::Clear()
 	objects.clear();
 }
 
+void CPlayScene::Add(LPGAMEOBJECT object)
+{
+	objects.push_back(object);
+}
+
 /*
 	Unload scene
 
@@ -433,6 +440,17 @@ void CPlayScene::Unload()
 }
 
 bool CPlayScene::IsGameObjectDeleted(const LPGAMEOBJECT& o) { return o == NULL; }
+
+vector<LPGAMEOBJECT>* CPlayScene::GetObjectsInCamera()
+{
+	vector<LPGAMEOBJECT>* result = new vector<LPGAMEOBJECT>();
+
+	for (int i = 0; i < objects.size(); i++)
+		if (IsGameObjectInCamera(objects[i]))
+			result->push_back(objects[i]);
+
+	return result;
+}
 
 bool CPlayScene::IsGameObjectInCamera(LPGAMEOBJECT obj) { 
 	float l, t, r, b;

@@ -35,10 +35,13 @@ public:
 	virtual void Unload();
 
 	LPGAMEOBJECT GetPlayer() { return player; }
-	
+	vector<LPGAMEOBJECT> GetObjects() {	return objects;	}
+	vector<LPGAMEOBJECT>* GetObjectsInCamera();
+
 	bool IsGameObjectInCamera(LPGAMEOBJECT obj);
 	void Clear();
 	void PurgeDeletedObjects();
+	void Add(LPGAMEOBJECT object);
 
 	static bool IsGameObjectDeleted(const LPGAMEOBJECT& o);
 };

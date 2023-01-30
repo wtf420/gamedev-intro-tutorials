@@ -49,6 +49,11 @@ void CKoopas::OnCollisionWith(LPCOLLISIONEVENT e)
 	if (dynamic_cast<CKoopas*>(e->obj)) return;
 	if (dynamic_cast<CMyth*>(e->obj) && this->state == KOOPAS_STATE_MOVING_SHELL)
 		dynamic_cast<CMyth*>(e->obj)->Interact();
+	if (dynamic_cast<CBrickWithCoin*>(e->obj))
+	{
+		if (this->state == KOOPAS_STATE_MOVING_SHELL)
+		e->obj->Delete();
+	}
 
 	if (e->ny != 0)
 	{
