@@ -119,16 +119,18 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		break;
 	}
 	case OBJECT_TYPE_MARIO:
-		if (player!=NULL) 
+	{
+		if (player != NULL)
 		{
 			DebugOut(L"[ERROR] MARIO object was created before!\n");
 			return;
 		}
-		obj = new CMario(x,y); 
-		player = (CMario*)obj;  
+		obj = new CMario(x, y);
+		player = (CMario*)obj;
 
 		DebugOut(L"[INFO] Player object has been created!\n");
 		break;
+	}
 	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(x,y); break;
 	case OBJECT_TYPE_SUPERGOOMBA: obj = new CSuperGoomba(x, y); break;
 	case OBJECT_TYPE_KOOPAS: obj = new CKoopas(x, y); break;
@@ -207,6 +209,21 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			cell_width, cell_height, length,
 			sprite_begin, sprite_middle, sprite_end
 		);
+
+		break;
+	}
+
+	case OBJECT_TYPE_PLATFORM_3:
+	{
+
+		float a = (float)atof(tokens[3].c_str());
+		float b = (float)atof(tokens[4].c_str());
+		float f = (float)atof(tokens[5].c_str());
+
+		obj = new CPlatform3(
+			x, y, a, b, f
+		);
+
 
 		break;
 	}
@@ -356,10 +373,15 @@ void CPlayScene::Update(DWORD dt)
 	if (cx < 0) cx = 0;
 	if (cy < -200) cy = -200; else
 	if (cy > -50) cy = 0;
+
+	CMario* mario = dynamic_cast<CMario*>(player);
+	if (mario && (mario->GetLevel() == MARIO_LEVEL_RACCOON && mario->IsMaxPower()))
+	{
+		if (cy < cyy)
+			cyy -= 10;
+	}
 	if (cy > cyy)
 		cyy += 10;
-	if (cy < cyy)
-		cyy -= 10;
 	if (abs(cyy - cy) < 10) cyy = cy;
 
 	CGame::GetInstance()->SetCamPos(cx, cyy);
@@ -372,7 +394,7 @@ void CPlayScene::Render()
 	if (CGame::GetInstance()->DrawBoundingBox == true)
 	{
 		LPSPRITE sprite = CSprites::GetInstance()->Get(100000);
-		sprite->Draw(1400, 88);
+		sprite->Draw(1400-16, 88);
 	}
 	for (int i = 0; i < objects.size(); i++)
 		if (IsGameObjectInCamera(objects[i]))

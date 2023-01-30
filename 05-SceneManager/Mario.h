@@ -201,6 +201,16 @@ public:
 		return (state != MARIO_STATE_DIE); 
 	}
 
+	int IsMaxPower()
+	{
+		return (power >= MARIO_POWER_LIMIT);
+	}
+
+	int IsFlying()
+	{
+		return (state != MARIO_STATE_DIE);
+	}
+
 	int IsBlocking() { return (state != MARIO_STATE_DIE && untouchable==0); }
 
 	void AddCoin() { coin++; };
@@ -208,7 +218,7 @@ public:
 	void OnNoCollision(DWORD dt);
 	void OnCollisionWith(LPCOLLISIONEVENT e);
 
-	int GetLevel() { return level; };
+	int GetLevel() { return this->level; };
 	void SetLevel(int l);
 	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount64(); }
 

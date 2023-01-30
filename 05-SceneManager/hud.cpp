@@ -8,10 +8,10 @@ void CHud::Render()
 	LPTEXTURE back = CTextures::GetInstance()->Get(ID_TEX_BACKGROUND);
 	CGame::GetInstance()->Draw(
 		CGame::GetInstance()->GetBackBufferWidth() / 2 + 1,
-		CGame::GetInstance()->GetBackBufferHeight() - (HUD_BBOX_HEIGHT + 25.0f) / 2.0f,
+		CGame::GetInstance()->GetBackBufferHeight() - (HUD_BBOX_HEIGHT + 27.0f) / 2.0f,
 		back, nullptr, 1.0f,
 		CGame::GetInstance()->GetBackBufferWidth(), 
-		HUD_BBOX_HEIGHT + 25);
+		HUD_BBOX_HEIGHT + 27);
 
 	LPSPRITE hudsprite = CSprites::GetInstance()->Get(ID_SPRITE_HUD);
 	hudsprite->Draw(x, y);

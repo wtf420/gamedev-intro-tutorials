@@ -53,6 +53,31 @@ public:
 	void RenderBoundingBox();
 };
 
+class CPlatform3 : public CGameObject
+{
+public:
+	float length, height, spriteId;
+	CPlatform3(float x, float y,
+		float a, float b) :CGameObject(x, y)
+	{
+		length = a;
+		height = b;
+		spriteId = -1;
+	}
+
+	CPlatform3(float x, float y,
+		float a, float b, float f) :CGameObject(x, y)
+	{
+		length = a;
+		height = b;
+		spriteId = f;
+	}
+
+	void Render();
+	void Update(DWORD dt) {}
+	void GetBoundingBox(float& l, float& t, float& r, float& b);
+};
+
 class CPlatformOneWay : public CGameObject
 {
 protected:
@@ -66,7 +91,10 @@ public:
 		height = b;
 	}
 
+	float GetTopPosition()
+	{
+		return y - height / 2;
+	}
 	void Render();
 	void GetBoundingBox(float& l, float& t, float& r, float& b);
-	void RenderBoundingBox();
 };

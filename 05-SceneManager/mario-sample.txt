@@ -22,5 +22,5 @@ height	720
 20	textures\misc.png
 30	textures\Untitled.png
 40	textures\hud-2.png
-50	textures\background 1-1.png
+50	textures\background 1-1 1.png
 60	textures\endstage.png

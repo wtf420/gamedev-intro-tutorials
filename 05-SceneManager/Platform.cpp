@@ -59,7 +59,7 @@ void CPlatform::GetBoundingBox(float& l, float& t, float& r, float& b)
 
 /*
 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                                    Pixel Platform
+                              Invisible x to y Platform
 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa*/
 
 void CPlatform2::Render()
@@ -95,6 +95,29 @@ void CPlatform2::RenderBoundingBox()
 
 /*
 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+							  A normal solid platform with sprite
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa*/
+
+void CPlatform3::Render()
+{
+	if (spriteId != -1)
+	{
+		LPSPRITE sprite = CSprites::GetInstance()->Get(spriteId);
+		sprite->Draw(x, y);
+	}
+	RenderBoundingBox();
+}
+
+void CPlatform3::GetBoundingBox(float& l, float& t, float& r, float& b)
+{
+	l = x - length / 2;
+	t = y - height / 2;
+	r = l + length;
+	b = t + height;
+}
+
+/*
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 									One Way Platform
 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa*/
 
@@ -105,26 +128,8 @@ void CPlatformOneWay::Render()
 
 void CPlatformOneWay::GetBoundingBox(float& l, float& t, float& r, float& b)
 {
-	l = x;
-	t = y;
-	r = l + (length);
-	b = t + (height);
-}
-
-void CPlatformOneWay::RenderBoundingBox()
-{
-	D3DXVECTOR3 p(x, y, 0);
-	RECT rect;
-
-	LPTEXTURE bbox = CTextures::GetInstance()->Get(ID_TEX_BBOX);
-
-	rect.left = 0;
-	rect.top = 0;
-	rect.right = (int)length;
-	rect.bottom = (int)height;
-
-	float cx, cy;
-	CGame::GetInstance()->GetCamPos(cx, cy);
-	if (CGame::GetInstance()->DrawBoundingBox == true)
-	CGame::GetInstance()->Draw(x + length / 2 - cx, y + height / 2 - cy, bbox, &rect, BBOX_ALPHA);
+	l = x - length / 2;
+	t = y - height / 2;
+	r = l + length;
+	b = t + height;
 }
