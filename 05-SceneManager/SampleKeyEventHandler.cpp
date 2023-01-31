@@ -21,6 +21,10 @@ void CSampleKeyHandler::OnKeyDown(int KeyCode)
 		break;
 	case DIK_DOWN:
 		mario->SetState(MARIO_STATE_SIT);
+		mario->isWarping = 1;
+		break;
+	case DIK_UP:
+		mario->isWarping = 1;
 		break;
 	case DIK_S:
 		mario->SetState(MARIO_STATE_JUMP);
@@ -54,6 +58,7 @@ void CSampleKeyHandler::OnKeyUp(int KeyCode)
 	//DebugOut(L"[INFO] KeyUp: %d\n", KeyCode);
 
 	CMario* mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+	mario->isWarping = 0;
 	switch (KeyCode)
 	{
 	case DIK_S:

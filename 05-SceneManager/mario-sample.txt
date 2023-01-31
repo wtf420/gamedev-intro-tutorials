@@ -16,7 +16,7 @@ height	720
 # id	file 
 [TEXTURES]
 -100	textures\bbox.png
--10	textures\UIbackground.png
+-10	textures\SecretRoomBackground.png
 0	textures\mario.png
 10	textures\enemies.png
 20	textures\misc.png

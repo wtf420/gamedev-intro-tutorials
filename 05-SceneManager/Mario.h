@@ -173,8 +173,10 @@ class CMario : public CGameObject
 public:
 	int attacking;
 	int isHolding;
+	int isWarping;
 	CMario(float x, float y) : CGameObject(x, y)
 	{
+		isWarping = 0;
 		isSitting = false;
 		maxVx = 0.0f;
 		maxVy = 0.0f;

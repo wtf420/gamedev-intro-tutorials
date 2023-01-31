@@ -78,6 +78,26 @@ public:
 	void GetBoundingBox(float& l, float& t, float& r, float& b);
 };
 
+class CWarpPipe : public CGameObject
+{
+public:
+	float length, height, spriteId;
+	float exitX, exitY;
+	CWarpPipe(float x, float y,
+		float a, float b, float f, float ex, float ey) :CGameObject(x, y)
+	{
+		length = a;
+		height = b;
+		exitX = ex;
+		exitY = ey;
+		spriteId = f;
+	}
+
+	void Render();
+	void Update(DWORD dt) {}
+	void GetBoundingBox(float& l, float& t, float& r, float& b);
+};
+
 class CPlatformOneWay : public CGameObject
 {
 protected:

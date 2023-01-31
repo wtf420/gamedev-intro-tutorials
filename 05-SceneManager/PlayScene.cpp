@@ -230,6 +230,23 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		break;
 	}
 
+	case OBJECT_TYPE_WARP_PIPE:
+	{
+
+		float a = (float)atof(tokens[3].c_str());
+		float b = (float)atof(tokens[4].c_str());
+		float f = (float)atof(tokens[5].c_str());
+		float ex = (float)atof(tokens[6].c_str());
+		float ey = (float)atof(tokens[7].c_str());
+
+		obj = new CWarpPipe(
+			x, y, a, b, f, ex, ey
+		);
+
+
+		break;
+	}
+
 	case OBJECT_TYPE_PLANT:
 	{
 		CPlantPipe* p = new CPlantPipe(x, y);
@@ -364,19 +381,40 @@ void CPlayScene::Update(DWORD dt)
 
 	// Update camera to follow mario
 	float cx, cy;
-	float cxx, cyy;
 	player->GetPosition(cx, cy);
 
+	//get mario position and clamp it
+	//mario is under ground set cam to underground
+	if (cy > 205)	cy = 340; else
+		//snap to ground utill you reach highest point possible without flying
+		if (cy > -15) cy = 132; else
+			//highest point that you can fly to.
+			if (cy < -150) cy = -150;
+
+	//translate it to camera coordinates
 	CGame *game = CGame::GetInstance();
 	cx -= game->GetBackBufferWidth() / 2;
 	cy -= game->GetBackBufferHeight() / 2;
-	game->GetCamPos(cxx, cyy);
 
-	if (cx < 0) cx = 0;
-	if (cy < -200) cy = -200; else
-	if (cy > -50) cy = 0;
+	float cxx, cyy;
+	game->GetCamPos(cxx, cyy);
+	//moving cam to new location
 
 	CMario* mario = dynamic_cast<CMario*>(player);
+	//snap camera to underground
+	if (cy >= 340) cyy = 340; else
+	//slowing pan camera to new location
+	{
+		if (cy < cyy)
+			cyy -= 10;
+		if (cy > cyy)
+			cyy += 10;
+		if (abs(cyy - cy) < 10) cyy = cy;
+	}
+	cxx = cx;
+
+	/*
+	* CMario* mario = dynamic_cast<CMario*>(player);
 	if (mario && (mario->GetLevel() == MARIO_LEVEL_RACCOON && mario->IsMaxPower()))
 	{
 		if (cy < cyy)
@@ -385,9 +423,12 @@ void CPlayScene::Update(DWORD dt)
 	if (cy > cyy)
 		cyy += 10;
 	if (abs(cyy - cy) < 10) cyy = cy;
+	*/
 
-	CGame::GetInstance()->SetCamPos(cx, cyy);
-	this->hud->SetPosition(cx + 76.0f + 10.0f, cyy + (game->GetBackBufferHeight() - 28.0f / 2) - 20.0f);
+	CGame::GetInstance()->SetCamPos(cxx, cyy);
+
+	CGame::GetInstance()->GetCamPos(cx, cy);
+	this->hud->SetPosition(cx + 76.0f + 10.0f, cy + (game->GetBackBufferHeight() - 28.0f / 2) - 20.0f);
 	PurgeDeletedObjects();
 }
 

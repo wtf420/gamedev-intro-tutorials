@@ -1,6 +1,7 @@
 # id	left	top	right	bottom	texture_id
 [SPRITES]
 100000	0	0	2815	625	30
+100069	0	0	800	300	-10
 
 #Big bushes
 100001	0	0	127	63	50

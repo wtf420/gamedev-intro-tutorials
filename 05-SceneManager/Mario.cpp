@@ -52,6 +52,11 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		maxVy = MARIO_MAX_GRAVITY;
 		if (vy > maxVy) vy = maxVy;
 	}
+	if (isWarping && dynamic_cast<CWarpPipe*>(currentPlatform))
+	{
+		CWarpPipe* warppipe = dynamic_cast<CWarpPipe*>(currentPlatform);
+		SetPosition(warppipe->exitX, warppipe->exitY);
+	}
 
 	if (attacking)
 	{
@@ -86,7 +91,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			else if (dynamic_cast<CBrickWithCoin*>(attack->at(i)))
 			{
 				CBrickWithCoin* brick = dynamic_cast<CBrickWithCoin*>(attack->at(i));
-				brick->Attacked();
+				brick->Delete();
 			}
 			else if (dynamic_cast<CBrickWithP*>(attack->at(i)))
 			{
@@ -137,6 +142,11 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		vx = 0;
 	}
 
+	if (isWarping && dynamic_cast<CWarpPipe*>(e->obj))
+	{
+		CWarpPipe* warppipe = dynamic_cast<CWarpPipe*>(currentPlatform);
+		SetPosition(warppipe->exitX, warppipe->exitY);
+	}
 	if (dynamic_cast<CMyth*>(e->obj))
 	{
 		if (e->ny > 0)

@@ -118,6 +118,29 @@ void CPlatform3::GetBoundingBox(float& l, float& t, float& r, float& b)
 
 /*
 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+							  Warp Pipe
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa*/
+
+void CWarpPipe::Render()
+{
+	if (spriteId != -1)
+	{
+		LPSPRITE sprite = CSprites::GetInstance()->Get(spriteId);
+		sprite->Draw(x, y);
+	}
+	RenderBoundingBox();
+}
+
+void CWarpPipe::GetBoundingBox(float& l, float& t, float& r, float& b)
+{
+	l = x - length / 2;
+	t = y - height / 2;
+	r = l + length;
+	b = t + height;
+}
+
+/*
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 									One Way Platform
 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa*/
 
