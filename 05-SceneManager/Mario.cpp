@@ -18,106 +18,126 @@
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
-	vy += ay * dt;
-	vx += ax * dt;
+	if (currentPba != -1)
+	{
+		vy += ay * dt;
+		vx += ax * dt;
 
-	if (abs(vx) > abs(maxVx)) vx = maxVx;
-	
-	if (abs(this->vx) > MARIO_WALKING_SPEED && isOnPlatform)
-	{
-		power++;
-		if (power > MARIO_POWER_LIMIT)
-			power = MARIO_POWER_LIMIT;
-	}
-	else if (isOnPlatform)
-	{
-		power--;
-		if (power < 0)
-			power = 0;
-	}
+		x += vx * dt;
+		y += vy * dt;
 
-	// reset untouchable timer if untouchable time has passed
-	if ( GetTickCount64() - untouchable_start > MARIO_UNTOUCHABLE_TIME) 
-	{
-		untouchable_start = 0;
-		untouchable = 0;
-	}
-	if (GetTickCount64() - attack_start > MARIO_ATTACK_TIME)
-	{
-		attack_start = 0;
-		attacking = 0;
-	}
-	if (GetTickCount64() - raccoonSpamJump_start <= MARIO_RACCOONSPAMJUMP_TIME)
-	{
-		maxVy = MARIO_MAX_GRAVITY;
-		if (vy > maxVy) vy = maxVy;
-	}
-	if (isWarping && dynamic_cast<CWarpPipe*>(currentPlatform))
-	{
-		CWarpPipe* warppipe = dynamic_cast<CWarpPipe*>(currentPlatform);
-		SetPosition(warppipe->exitX, warppipe->exitY);
-	}
-
-	if (attacking)
-	{
-		vector<LPGAMEOBJECT>* attack = Attack(10.0f, 0.0f);
-		for (int i = 0; i < attack->size(); i++)
+		PbaTimer += dt;
+		if (PbaTimer >= timetillnextPba)
 		{
-			if (dynamic_cast<CBrick*>(attack->at(i)))
-				attack->at(i)->Delete();
-			else if (dynamic_cast<CPlant*>(attack->at(i)))
-			{
-				CPlant* plant = dynamic_cast<CPlant*>(attack->at(i));
-				plant->Die();
-			}
-			else if (dynamic_cast<CPlantBullet*>(attack->at(i)))
-				attack->at(i)->Delete();
-			else if (dynamic_cast<CGoomba*>(attack->at(i)))
-			{
-				if (attack->at(i)->GetState() != GOOMBA_STATE_DIE) attack->at(i)->SetState(GOOMBA_STATE_DIE);
-			}
-			else if (dynamic_cast<CSuperGoomba*>(attack->at(i)))
-			{
-				if (attack->at(i)->GetState() != GOOMBA_STATE_DIE) attack->at(i)->SetState(GOOMBA_STATE_DIE);
-			}
-			else if (dynamic_cast<CKoopas*>(attack->at(i)))
-			{
-				if (attack->at(i)->GetState() == KOOPAS_STATE_WALKING) attack->at(i)->SetState(KOOPAS_STATE_DIE);
-			}
-			else if (dynamic_cast<CSuperKoopas*>(attack->at(i)))
-			{
-				if (attack->at(i)->GetState() != KOOPAS_STATE_DIE) attack->at(i)->SetState(KOOPAS_STATE_DIE);
-			}
-			else if (dynamic_cast<CBrickWithCoin*>(attack->at(i)))
-			{
-				CBrickWithCoin* brick = dynamic_cast<CBrickWithCoin*>(attack->at(i));
-				brick->Delete();
-			}
-			else if (dynamic_cast<CBrickWithP*>(attack->at(i)))
-			{
-				CBrickWithP* brick = dynamic_cast<CBrickWithP*>(attack->at(i));
-				brick->Attacked();
-			}
+			PbaStep++;
+			StartPBA(currentPba, PbaStep);
 		}
 	}
-
-	vector<LPGAMEOBJECT> coObjects2;
-	for (int k = 0; k < coObjects->size(); k++)
+	else
 	{
-		CPlatformOneWay* u = dynamic_cast<CPlatformOneWay*>(coObjects->at(k));
-		float top = 0;
-		if (u) top = u->GetTopPosition();
-		if ((!u) || (u == currentPlatform) || (u && top >= y))
-		{
-			coObjects2.push_back(coObjects->at(k));
-		}
-	}
-	CCollision::GetInstance()->Process(this, dt, &coObjects2);
+		vy += ay * dt;
+		vx += ax * dt;
 
-	std::string stddrivestring = to_string(this->x) + " | " + to_string(this->y);
-	std::wstring widedrivestring = std::wstring(stddrivestring.begin(), stddrivestring.end());
-	const wchar_t* TargetDrive = widedrivestring.c_str();
-	DebugOutTitle(TargetDrive);
+		if (abs(vx) > abs(maxVx)) vx = maxVx;
+
+		if (abs(this->vx) > MARIO_WALKING_SPEED && isOnPlatform)
+		{
+			power++;
+			if (power > MARIO_POWER_LIMIT)
+				power = MARIO_POWER_LIMIT;
+		}
+		else if (isOnPlatform)
+		{
+			power--;
+			if (power < 0)
+				power = 0;
+		}
+
+		// reset untouchable timer if untouchable time has passed
+		if (GetTickCount64() - untouchable_start > MARIO_UNTOUCHABLE_TIME)
+		{
+			untouchable_start = 0;
+			untouchable = 0;
+		}
+		if (GetTickCount64() - attack_start > MARIO_ATTACK_TIME)
+		{
+			attack_start = 0;
+			attacking = 0;
+		}
+		if (GetTickCount64() - raccoonSpamJump_start <= MARIO_RACCOONSPAMJUMP_TIME)
+		{
+			maxVy = MARIO_MAX_GRAVITY;
+			if (vy > maxVy) vy = maxVy;
+		}
+		if (isWarping && dynamic_cast<CWarpPipe*>(currentPlatform))
+		{
+			CWarpPipe* warppipe = dynamic_cast<CWarpPipe*>(currentPlatform);
+			SetPosition(warppipe->exitX, warppipe->exitY);
+		}
+
+		if (attacking)
+		{
+			vector<LPGAMEOBJECT>* attack = Attack(10.0f, 0.0f);
+			for (int i = 0; i < attack->size(); i++)
+			{
+				if (dynamic_cast<CBrick*>(attack->at(i)))
+					attack->at(i)->Delete();
+				else if (dynamic_cast<CPlant*>(attack->at(i)))
+				{
+					CPlant* plant = dynamic_cast<CPlant*>(attack->at(i));
+					plant->Die();
+				}
+				else if (dynamic_cast<CPlantBullet*>(attack->at(i)))
+					attack->at(i)->Delete();
+				else if (dynamic_cast<CGoomba*>(attack->at(i)))
+				{
+					if (attack->at(i)->GetState() != GOOMBA_STATE_DIE) attack->at(i)->SetState(GOOMBA_STATE_ATTACKED);
+				}
+				else if (dynamic_cast<CSuperGoomba*>(attack->at(i)))
+				{
+					if (attack->at(i)->GetState() != GOOMBA_STATE_DIE) attack->at(i)->SetState(GOOMBA_STATE_ATTACKED);
+				}
+				else if (dynamic_cast<CKoopas*>(attack->at(i)))
+				{
+					CKoopas* koopas = dynamic_cast<CKoopas*>(attack->at(i));
+					koopas->Attacked();
+				}
+				else if (dynamic_cast<CSuperKoopas*>(attack->at(i)))
+				{
+					CSuperKoopas* koopas = dynamic_cast<CSuperKoopas*>(attack->at(i));
+					koopas->Attacked();
+				}
+				else if (dynamic_cast<CBrickWithCoin*>(attack->at(i)))
+				{
+					CBrickWithCoin* brick = dynamic_cast<CBrickWithCoin*>(attack->at(i));
+					brick->Delete();
+				}
+				else if (dynamic_cast<CBrickWithP*>(attack->at(i)))
+				{
+					CBrickWithP* brick = dynamic_cast<CBrickWithP*>(attack->at(i));
+					brick->Attacked();
+				}
+			}
+		}
+
+		vector<LPGAMEOBJECT> coObjects2;
+		for (int k = 0; k < coObjects->size(); k++)
+		{
+			CPlatformOneWay* u = dynamic_cast<CPlatformOneWay*>(coObjects->at(k));
+			float top = 0;
+			if (u) top = u->GetTopPosition();
+			if ((!u) || (u == currentPlatform) || (u && top >= y))
+			{
+				coObjects2.push_back(coObjects->at(k));
+			}
+		}
+		CCollision::GetInstance()->Process(this, dt, &coObjects2);
+
+		std::string stddrivestring = to_string(this->x) + " | " + to_string(this->y);
+		std::wstring widedrivestring = std::wstring(stddrivestring.begin(), stddrivestring.end());
+		const wchar_t* TargetDrive = widedrivestring.c_str();
+		DebugOutTitle(TargetDrive);
+	}
 }
 
 void CMario::OnNoCollision(DWORD dt)
@@ -176,6 +196,61 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithMushroom(e);
 	else if (dynamic_cast<CPortal*>(e->obj))
 		OnCollisionWithPortal(e);
+}
+
+void CMario::StartPBA(int pba, int step)
+{
+	switch (pba)
+	{
+	case 1:
+		currentPba = 1;
+		PbaStep = 1;
+		PbaTimer = 0;
+		GetDiePBA(step);
+		break;
+	case 2:
+		currentPba = 2;
+		PbaStep = 1;
+		PbaTimer = 0;
+		break;
+	default:
+		break;
+	}
+}
+
+void CMario::GetDiePBA(int step)
+{
+	switch (step)
+	{
+	case 1:
+	{
+		acceptKeyboardInput = 0;
+		PbaStep = 1;
+		PbaTimer = 0;
+
+		colliable = 0;
+		CGame::GetInstance()->SetTimeScale(0.0f);
+		timetillnextPba = 500;
+		vx = 0;
+		vy = 0;
+		ax = 0;
+		ay = 0;
+		break;
+	}
+	case 2:
+	{
+		PbaStep = 2;
+		PbaTimer = 0;
+		vx = 0;
+		vy = -MARIO_JUMP_DEFLECT_SPEED;
+		ax = 0;
+		ay = MARIO_GRAVITY;
+		timetillnextPba = 3000;
+		break;
+	}
+	default:
+		break;
+	}
 }
 
 vector<LPGAMEOBJECT>* CMario::Attack(float rangeX, float rangeY)
@@ -240,7 +315,7 @@ void CMario::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
 	{
 		if (untouchable == 0 || attacking == 0)
 		{
-			if (goomba->GetState() != GOOMBA_STATE_DIE)
+			if (goomba->GetState() != GOOMBA_STATE_DIE && goomba->GetState() != GOOMBA_STATE_ATTACKED)
 			{
 				if (level == MARIO_LEVEL_RACCOON)
 				{
@@ -285,7 +360,7 @@ void CMario::OnCollisionWithSuperGoomba(LPCOLLISIONEVENT e)
 	{
 		if (untouchable == 0 || attacking == 0)
 		{
-			if (goomba->GetState() != GOOMBA_STATE_DIE)
+			if (goomba->GetState() != GOOMBA_STATE_DIE && goomba->GetState() != GOOMBA_STATE_ATTACKED)
 			{
 				if (level == MARIO_LEVEL_RACCOON)
 				{
@@ -331,6 +406,11 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 	}
 	else // hit by KOOPAS
 	{
+		if (koopas->GetState() == KOOPAS_STATE_SHELL)
+		{
+			koopas->SetState(KOOPAS_STATE_MOVING_SHELL);
+		}
+		else
 		if (untouchable == 0 || attacking == 0)
 		{
 			if (koopas->GetState() != KOOPAS_STATE_SHELL && koopas->GetState() != KOOPAS_STATE_CARRIED)
@@ -385,6 +465,11 @@ void CMario::OnCollisionWithSuperKoopas(LPCOLLISIONEVENT e)
 	}
 	else // hit by Koopas
 	{
+		if (Koopas->GetState() == KOOPAS_STATE_SHELL)
+		{
+			Koopas->SetState(KOOPAS_STATE_MOVING_SHELL);
+		}
+		else
 		if (untouchable == 0 || attacking == 0)
 		{
 			if (Koopas->GetState() != KOOPAS_STATE_DIE)
@@ -847,9 +932,7 @@ void CMario::SetState(int state)
 			break;
 
 		case MARIO_STATE_DIE:
-			vy = -MARIO_JUMP_DEFLECT_SPEED;
-			vx = 0;
-			ax = 0;
+			StartPBA(1, 1);
 			break;
 		}
 

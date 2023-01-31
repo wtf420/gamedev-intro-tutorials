@@ -13,20 +13,23 @@
 #define GOOMBA_BBOX_HEIGHT_DIE 7
 
 #define GOOMBA_DIE_TIMEOUT 500
-#define GOOMBA_JUMp_COOLDOWN 2000
+#define GOOMBA_JUMP_COOLDOWN 2000
 
 #define GOOMBA_STATE_SUPER_WALKING 50
 #define GOOMBA_STATE_WALKING 100
 #define GOOMBA_STATE_DIE 200
 #define GOOMBA_STATE_FLYING 300
+#define GOOMBA_STATE_ATTACKED 400
 
 #define ID_ANI_GOOMBA_WALKING 5000
 #define ID_ANI_GOOMBA_DIE 5001
 #define ID_ANI_GOOMBA_SUPERWALK 5100
 #define ID_ANI_GOOMBA_FLY 5200
+#define ID_ANI_GOOMBA_ATTACKED 5300
 
 class CGoomba : public CGameObject
 {
+	int colliable = 1;
 protected:
 	float ax;				
 	float ay; 
@@ -39,7 +42,7 @@ protected:
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects);
 	virtual void Render();
 
-	virtual int IsCollidable() { return 1; };
+	virtual int IsCollidable() { return colliable; };
 	virtual int IsBlocking() { return 0; }
 	virtual void OnNoCollision(DWORD dt);
 
@@ -52,6 +55,7 @@ public:
 
 class CSuperGoomba : public CGameObject
 {
+	int colliable = 1;
 protected:
 	float ax;
 	float ay;
@@ -66,7 +70,7 @@ protected:
 	virtual void Render();
 	virtual bool canJump();
 
-	virtual int IsCollidable() { return 1; };
+	virtual int IsCollidable() { return colliable; };
 	virtual int IsBlocking() { return 0; }
 	virtual void OnNoCollision(DWORD dt);
 

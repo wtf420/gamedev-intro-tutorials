@@ -146,9 +146,14 @@ class CMario : public CGameObject
 	float absx() { return x + (MARIO_BIG_BBOX_WIDTH / 2); };
 	float absy() { return y + (MARIO_BIG_BBOX_HEIGHT / 2); };
 
-
 	int level; 
 	int untouchable; 
+
+	int currentPba = -1;
+	int PbaStep;
+	ULONGLONG PbaTimer, timetillnextPba;
+
+	int colliable = 1;
 	ULONGLONG untouchable_start, raccoonSpamJump_start, attack_start;
 	BOOLEAN isOnPlatform;
 	int coin; 
@@ -170,7 +175,11 @@ class CMario : public CGameObject
 	int GetAniIdSmall();
 	int GetAniIdRaccoon();
 
+	void GetDiePBA(int step);
+	void StartPBA(int pba, int step);
+
 public:
+	int acceptKeyboardInput = 1;
 	int attacking;
 	int isHolding;
 	int isWarping;
@@ -202,7 +211,7 @@ public:
 
 	int IsCollidable()
 	{ 
-		return (state != MARIO_STATE_DIE); 
+		return (colliable);
 	}
 
 	int IsMaxPower()

@@ -21,12 +21,14 @@
 #define KOOPAS_STATE_CARRIED 400
 #define KOOPAS_STATE_FLYING 500
 
-#define ID_ANI_KOOPAS_WALKING 7100
+#define ID_ANI_KOOPAS_WALKING_LEFT 7100
+#define ID_ANI_KOOPAS_WALKING_RIGHT 7101
 #define ID_ANI_KOOPAS_SHELL 7200
 #define ID_ANI_KOOPAS_FLYING 7500
 
 class CKoopas : public CGameObject
 {
+	int whatever = 0;
 protected:
 	float ax;
 	float ay;
@@ -49,10 +51,12 @@ protected:
 public:
 	CKoopas(float x, float y);
 	virtual void SetState(int state);
+	void Attacked();
 };
 
 class CSuperKoopas : public CGameObject
 {
+	int whatever = 0;
 protected:
 	float ax;
 	float ay;
@@ -75,4 +79,5 @@ protected:
 public:
 	CSuperKoopas(float x, float y);
 	virtual void SetState(int state);
+	void Attacked();
 };

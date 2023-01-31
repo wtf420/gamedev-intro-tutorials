@@ -73,6 +73,8 @@ public:
 		spriteId = f;
 	}
 
+	float GetLeftPosition() { return x - length / 2; }
+	float GetTopPosition() { return y - height / 2; }
 	void Render();
 	void Update(DWORD dt) {}
 	void GetBoundingBox(float& l, float& t, float& r, float& b);
@@ -93,6 +95,8 @@ public:
 		spriteId = f;
 	}
 
+	float GetLeftPosition() { return x - length / 2; }
+	float GetTopPosition() { return y - height / 2; }
 	void Render();
 	void Update(DWORD dt) {}
 	void GetBoundingBox(float& l, float& t, float& r, float& b);
@@ -111,10 +115,8 @@ public:
 		height = b;
 	}
 
-	float GetTopPosition()
-	{
-		return y - height / 2;
-	}
+	float GetLeftPosition()	{ return x - length / 2; }
+	float GetTopPosition()	{ return y - height / 2; }
 	void Render();
 	void GetBoundingBox(float& l, float& t, float& r, float& b);
 };

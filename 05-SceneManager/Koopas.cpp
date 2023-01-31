@@ -57,6 +57,11 @@ void CKoopas::OnCollisionWith(LPCOLLISIONEVENT e)
 
 	if (e->ny != 0)
 	{
+		if (whatever == 1 && state == KOOPAS_STATE_SHELL)
+		{
+			whatever = 0;
+			vx = 0;
+		}
 		vy = 0;
 	}
 	else if (e->nx != 0)
@@ -117,10 +122,20 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			if (dynamic_cast<CPlatformOneWay*>(currentPlatform))
 			{
 				CPlatformOneWay* u = dynamic_cast<CPlatformOneWay*>(currentPlatform);
-				float ux, uy;
-				u->GetPosition(ux, uy);
-				if (x < ux || x > ux + u->length)
+				float left = u->GetLeftPosition();
+				if (x < left || x > left + u->length)
+				{
 					vx = -vx;
+				}
+			}
+			else if (dynamic_cast<CPlatform3*>(currentPlatform))
+			{
+				CPlatform3* u = dynamic_cast<CPlatform3*>(currentPlatform);
+				float left = u->GetLeftPosition();
+				if (x < left || x > left + u->length)
+				{
+					vx = -vx;
+				}
 			}
 			else if (dynamic_cast<CPlatform2*>(currentPlatform))
 			{
@@ -152,9 +167,9 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		for (int k = 0; k < coObjects->size(); k++)
 		{
 			CPlatformOneWay* u = dynamic_cast<CPlatformOneWay*>(coObjects->at(k));
-			float ux, uy = 0.0f;
-			if (u) u->GetPosition(ux, uy);
-			if (!u || u == currentPlatform || (u && uy >= y))
+			float top = 0;
+			if (u) top = u->GetTopPosition();
+			if ((!u) || (u == currentPlatform) || (u && top >= y))
 			{
 				coObjects2.push_back(coObjects->at(k));
 			}
@@ -168,7 +183,9 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 void CKoopas::Render()
 {
-	int aniId = ID_ANI_KOOPAS_WALKING;
+	int aniId = 0;
+	if (vx < 0) aniId = ID_ANI_KOOPAS_WALKING_LEFT; else
+		aniId = ID_ANI_KOOPAS_WALKING_RIGHT;
 	if (state == KOOPAS_STATE_SHELL || state == KOOPAS_STATE_MOVING_SHELL || state == KOOPAS_STATE_CARRIED)
 	{
 		aniId = ID_ANI_KOOPAS_SHELL;
@@ -176,6 +193,21 @@ void CKoopas::Render()
 
 	CAnimations::GetInstance()->Get(aniId)->Render(x, y);
 	RenderBoundingBox();
+}
+
+void CKoopas::Attacked()
+{
+	this->SetState(KOOPAS_STATE_SHELL);
+	whatever = 1;
+	float mx, my;
+	mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+	mario->GetPosition(mx, my);
+
+	if (mx > x)
+		vx = -KOOPAS_WALKING_SPEED; else
+		vx = KOOPAS_WALKING_SPEED;
+	vy = -0.5f;
+	ay = KOOPAS_GRAVITY;
 }
 
 void CKoopas::SetState(int state)
@@ -187,12 +219,12 @@ void CKoopas::SetState(int state)
 		lastvx = vx;
 		if (this->state == KOOPAS_STATE_WALKING)
 		{
-			y += (KOOPAS_BBOX_HEIGHT - KOOPAS_BBOX_HEIGHT_SHELL) / 2;
+			y += (KOOPAS_BBOX_HEIGHT - KOOPAS_BBOX_HEIGHT_SHELL) / 2 - 1;
 		}
-		y -= 1;
 		vx = 0;
 		vy = 0;
-		ay = 0;
+		ax = 0;
+		ay = KOOPAS_GRAVITY;
 		break;
 	case KOOPAS_STATE_WALKING:
 		y -= (KOOPAS_BBOX_HEIGHT - KOOPAS_BBOX_HEIGHT_SHELL) / 2 + 1.0f;
@@ -275,6 +307,11 @@ void CSuperKoopas::OnCollisionWith(LPCOLLISIONEVENT e)
 
 	if (e->ny != 0)
 	{
+		if (whatever == 1 && state == KOOPAS_STATE_SHELL)
+		{
+			whatever = 0;
+			vx = 0;
+		}
 		if (this->state == KOOPAS_STATE_FLYING)
 			vy = -KOOPAS_JUMP_SPEED_Y;
 		else
@@ -338,10 +375,19 @@ void CSuperKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			if (dynamic_cast<CPlatformOneWay*>(currentPlatform))
 			{
 				CPlatformOneWay* u = dynamic_cast<CPlatformOneWay*>(currentPlatform);
-				float ux, uy;
-				u->GetPosition(ux, uy);
-				if (x < ux || x > ux + u->length)
+				float left = u->GetLeftPosition();
+				if (x < left || x > left + u->length)
+				{
 					vx = -vx;
+				}
+			} else if (dynamic_cast<CPlatform3*>(currentPlatform))
+			{
+				CPlatform3* u = dynamic_cast<CPlatform3*>(currentPlatform);
+				float left = u->GetLeftPosition();
+				if (x < left || x > left + u->length)
+				{
+					vx = -vx;
+				}
 			}
 			else if (dynamic_cast<CPlatform2*>(currentPlatform))
 			{
@@ -373,9 +419,9 @@ void CSuperKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		for (int k = 0; k < coObjects->size(); k++)
 		{
 			CPlatformOneWay* u = dynamic_cast<CPlatformOneWay*>(coObjects->at(k));
-			float ux, uy = 0.0f;
-			if (u) u->GetPosition(ux, uy);
-			if (!u || u == currentPlatform || (u && uy >= y))
+			float top = 0;
+			if (u) top = u->GetTopPosition();
+			if ((!u) || (u == currentPlatform) || (u && top >= y))
 			{
 				coObjects2.push_back(coObjects->at(k));
 			}
@@ -395,11 +441,27 @@ void CSuperKoopas::Render()
 	}
 	else if (state == KOOPAS_STATE_WALKING)
 	{
-		aniId = ID_ANI_KOOPAS_WALKING;
+		if (vx < 0) aniId = ID_ANI_KOOPAS_WALKING_LEFT; else
+			aniId = ID_ANI_KOOPAS_WALKING_RIGHT;
 	}
 
 	CAnimations::GetInstance()->Get(aniId)->Render(x, y);
 	RenderBoundingBox();
+}
+
+void CSuperKoopas::Attacked()
+{
+	this->SetState(KOOPAS_STATE_SHELL);
+	whatever = 1;
+	float mx, my;
+	mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+	mario->GetPosition(mx, my);
+
+	if (mx > x)
+		vx = -KOOPAS_WALKING_SPEED; else
+		vx = KOOPAS_WALKING_SPEED;
+	vy = -0.5f;
+	ay = KOOPAS_GRAVITY;
 }
 
 void CSuperKoopas::SetState(int state)

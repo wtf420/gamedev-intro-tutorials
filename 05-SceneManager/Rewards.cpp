@@ -68,9 +68,9 @@ void CRMushroom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	for (int k = 0; k < coObjects->size(); k++)
 	{
 		CPlatformOneWay* u = dynamic_cast<CPlatformOneWay*>(coObjects->at(k));
-		float ux, uy = 0.0f;
-		if (u) u->GetPosition(ux, uy);
-		if (!u || u == currentPlatform || (u && uy >= y))
+		float top = 0;
+		if (u) top = u->GetTopPosition();
+		if ((!u) || (u == currentPlatform) || (u && top >= y))
 		{
 			coObjects2.push_back(coObjects->at(k));
 		}
