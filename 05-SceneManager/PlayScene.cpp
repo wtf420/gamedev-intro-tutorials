@@ -86,6 +86,8 @@ void CPlayScene::_ParseSection_ANIMATIONS(string line)
 	for (int i = 1; i < tokens.size(); i += 2)	// why i+=2 ?  sprite_id | frame_time  
 	{
 		int sprite_id = atoi(tokens[i].c_str());
+		if (CSprites::GetInstance()->Get(sprite_id) == NULL)
+			DebugOut(L"ANIMATION %i: SPRITE NOT FOUND: %i\n", ani_id, sprite_id);
 		int frame_time = atoi(tokens[i+1].c_str());
 		ani->Add(sprite_id, frame_time);
 	}
@@ -139,6 +141,8 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_BRICK_WITH_COIN: obj = new CBrickWithCoin(x, y); break;
 	case OBJECT_TYPE_BRICK_WITH_POWER: obj = new CBrickWithP(x, y); break;
 	case OBJECT_TYPE_COIN: obj = new CCoin(x, y); break;
+	case OBJECT_TYPE_PLANT:	obj = new CPlant(x, y + 24); break;
+	case OBJECT_TYPE_PLANT_2:	obj = new CPlant2(x, y + 24); break;
 	case OBJECT_TYPE_MYTH_COIN:
 	{
 
@@ -247,20 +251,6 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		break;
 	}
 
-	case OBJECT_TYPE_PLANT:
-	{
-		CPlantPipe* p = new CPlantPipe(x, y);
-		p->SetPosition(x, y);
-		objects.push_back(p);
-
-		CPlantBullet* pb = new CPlantBullet(x, y);
-		pb->SetPosition(x, y);
-		objects.push_back(pb);
-
-		obj = new CPlant(x, y, pb);
-
-		break;
-	}
 
 	case OBJECT_TYPE_PORTAL:
 	{
@@ -390,6 +380,7 @@ void CPlayScene::Update(DWORD dt)
 		if (cy > -15) cy = 132; else
 			//highest point that you can fly to.
 			if (cy < -150) cy = -150;
+	if (cx > 2700) cx = 2700;
 
 	//translate it to camera coordinates
 	CGame *game = CGame::GetInstance();
@@ -500,7 +491,7 @@ bool CPlayScene::IsGameObjectInCamera(LPGAMEOBJECT obj) {
 	CGame::GetInstance()->GetCamPos(cx, cy);
 
 	float w = CGame::GetInstance()->GetBackBufferWidth() / 2.0f;
-	float h = CGame::GetInstance()->GetBackBufferWidth() / 2.0f;
+	float h = CGame::GetInstance()->GetBackBufferHeight() / 2.0f;
 	cx += w;
 	cy += h;
 	if ((l > cx + w) || (t > cy + w) || (r < cx - w) || (b < cy - w))

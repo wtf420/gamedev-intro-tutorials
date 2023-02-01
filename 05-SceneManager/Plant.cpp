@@ -3,38 +3,14 @@
 #include "debug.h"
 #include <string>
 
-void CPlantPipe::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
-{
-	Render();
-	CCollision::GetInstance()->Process(this, dt, coObjects);
-}
-
-void CPlantPipe::Render()
-{
-	CAnimations* animations = CAnimations::GetInstance();
-	animations->Get(ID_ANI_PLANT_TUBE)->Render(x, y);
-	//RenderBoundingBox();
-}
-
-void CPlantPipe::GetBoundingBox(float& l, float& t, float& r, float& b)
-{
-	l = x - PLANT_TUBE_BBOX_WIDTH / 2;
-	t = y - PLANT_TUBE_BBOX_HEIGHT / 2;
-	r = l + PLANT_TUBE_BBOX_WIDTH;
-	b = t + PLANT_TUBE_BBOX_HEIGHT;
-}
-
 /********************************************************************************************/
 
 void CPlant::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	if (CanAttack())
 		Attack();
-	if (GetTickCount64() - lastattack > ID_ANI_PLANT_BULLET_ALIVE_TIME && !isActive)
-	{
-		plantbullet->Reset(-100, -100);
-	}
 
+	//First version ever of the PBA system, not fixing it because its working perfectly
 	if (isActive)
 	{
 		//reached max
@@ -43,13 +19,13 @@ void CPlant::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			y = maxY;
 			attacking = GetTickCount64();
 			vy = 0;
-			plantbullet->Reset(this->x, this->maxY);
 		} // attack
 		else if (GetTickCount64() - attacking > PLANT_ATTACK_TIME && vy == 0)
 		{
 			lastattack = GetTickCount64();
 			vy = PLANT_UP_SPEED_Y;
-			plantbullet->Shoot();
+			CPlantBullet* bullet = new CPlantBullet(this->x, this->y);
+			((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->Add(bullet);
 		}
 		else //reached min
 			if (y >= originalY && vy > 0)
@@ -73,7 +49,6 @@ void CPlant::Attack()
 }
 void CPlant::Die()
 {
-	plantbullet->Delete();
 	isDeleted = true;
 }
 
@@ -93,7 +68,26 @@ bool CPlant::CanAttack()
 void CPlant::Render()
 {
 	CAnimations* animations = CAnimations::GetInstance();
-	animations->Get(ID_ANI_PLANT)->Render(x, y);
+	animations->Get(GetAniId())->Render(x, y);
+}
+
+int CPlant::GetAniId()
+{
+	float mx, my;
+	mario->GetPosition(mx, my);
+
+	if (mx < this->x)
+	{
+		if (my > this->y)
+			return ID_ANI_PLANT_LEFT_DOWN; else
+			return ID_ANI_PLANT_LEFT_UP;
+	}
+	else
+	{
+		if (my > this->y)
+			return ID_ANI_PLANT_RIGHT_DOWN; else
+			return ID_ANI_PLANT_RIGHT_UP;
+	}
 }
 
 void CPlant::GetBoundingBox(float& l, float& t, float& r, float& b)
@@ -108,57 +102,56 @@ void CPlant::GetBoundingBox(float& l, float& t, float& r, float& b)
 
 void CPlantBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	Render();
-	float timeScale;
-	CGame::GetInstance()->GetTimeScale(timeScale);
-	if (timeScale == 0.0f)
-	{
-		if (!timeStopped)
-		{
-			timeStopped = true;
-			lastvx = vx;
-			lastvy = vy;
-		}
-		vx = 0;
-		vy = 0;
-	}
+	if (!isInsideCamera()) Delete(); 
 	else
 	{
-		if (timeStopped)
+		Render();
+		float timeScale;
+		CGame::GetInstance()->GetTimeScale(timeScale);
+		if (timeScale == 0.0f)
 		{
-			vx = lastvx;
-			vy = lastvy;
-			timeStopped = false;
+			if (!timeStopped)
+			{
+				timeStopped = true;
+				lastvx = vx;
+				lastvy = vy;
+			}
+			vx = 0;
+			vy = 0;
 		}
+		else
+		{
+			if (timeStopped)
+			{
+				vx = lastvx;
+				vy = lastvy;
+				timeStopped = false;
+			}
+		}
+		x += vx * dt;
+		y += vy * dt;
+		CCollision::GetInstance()->Process(this, dt, coObjects);
 	}
-
-	x += vx * dt;
-	y += vy * dt;
-	CCollision::GetInstance()->Process(this, dt, coObjects);
 }
 
-void CPlantBullet::Shoot()
+bool CPlantBullet::isInsideCamera()
 {
-	float mx, my;
-	mario->GetPosition(mx, my);
+	float l, t, r, b;
+	GetBoundingBox(l, t, r, b);
+	float cx, cy;
+	CGame::GetInstance()->GetCamPos(cx, cy);
 
-	float dis = sqrt(abs(mx - this->x) * abs(mx - this->x) + abs(mx - this->y) * abs(mx - this->y));
-	vx = (mx - x) / ( dis / PLANT_BULLET_SPEED);
-	vy = (my - y) / (dis / PLANT_BULLET_SPEED);
-}
-
-void CPlantBullet::Reset(float px, float py)
-{
-	vx = 0.0f;
-	vy = 0.0f;
-	x = px;
-	y = py;
-}
-
-void CPlantBullet::Reset2()
-{
-	x = oriX;
-	y = oriY;
+	float w = CGame::GetInstance()->GetBackBufferWidth() / 2.0f;
+	float h = CGame::GetInstance()->GetBackBufferHeight() / 2.0f;
+	cx += w;
+	cy += h;
+	DebugOut(L"%f, %f, %f, %f\n", cx, cy, w, h);
+	DebugOut(L"%f, %f, %f, %f\n", l, t, r, b);
+	DebugOut(L"%f, %f\n", l, cx + w);
+	//Once the bullet is out of camera it will stop updating position, so we plan ahead
+	if ((l + 1.0f > cx + w) || (t + 1.0f > cy + w) || (r - 1.0f < cx - w) || (b - 1.0f < cy - w))
+		return false;
+	return true;
 }
 
 void CPlantBullet::Render()
@@ -174,4 +167,78 @@ void CPlantBullet::GetBoundingBox(float& l, float& t, float& r, float& b)
 	t = y - PLANT_BULLET_BBOX_HEIGHT / 2;
 	r = l + PLANT_BULLET_BBOX_WIDTH;
 	b = t + PLANT_BULLET_BBOX_HEIGHT;
+}
+
+/********************************************************************************************/
+
+void CPlant2::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+{
+	if (CanAttack())
+		Attack();
+
+	//First version ever of the PBA system, not fixing it because its working perfectly
+	if (isActive)
+	{
+		//reached max
+		if (y <= maxY && vy < 0)
+		{
+			y = maxY;
+			attacking = GetTickCount64();
+			vy = 0;
+		} // attack
+		else if (GetTickCount64() - attacking > PLANT_ATTACK_TIME && vy == 0)
+		{
+			lastattack = GetTickCount64();
+			vy = PLANT_UP_SPEED_Y;
+		}
+		else //reached min
+			if (y >= originalY && vy > 0)
+			{
+				isActive = 0;
+				lastattack = GetTickCount64();
+				collidable = 0;
+				y = originalY;
+				vy = 0;
+			}
+	}
+
+	y += vy * dt;
+}
+
+void CPlant2::Attack()
+{
+	isActive = 1;
+	vy = -PLANT_UP_SPEED_Y;
+	collidable = 1;
+}
+void CPlant2::Die()
+{
+	isDeleted = true;
+}
+
+bool CPlant2::CanAttack()
+{
+	if (isActive)
+		return false;
+	float mx, my;
+	mario->GetPosition(mx, my);
+	if (abs(mx - this->x) <= 30 || abs(mx - this->x) >= 150)
+		return false;
+	if (GetTickCount64() - lastattack < PLANT_ATTACK_COOLDOWN)
+		return false;
+	return true;
+}
+
+void CPlant2::Render()
+{
+	CAnimations* animations = CAnimations::GetInstance();
+	animations->Get(ID_ANI_PLANT_2)->Render(x, y);
+}
+
+void CPlant2::GetBoundingBox(float& l, float& t, float& r, float& b)
+{
+	l = x - PLANT_MYTH_BBOX_WIDTH / 2;
+	t = y - PLANT_MYTH_BBOX_HEIGHT / 2;
+	r = l + PLANT_MYTH_BBOX_WIDTH;
+	b = t + PLANT_MYTH_BBOX_HEIGHT;
 }

@@ -41,8 +41,7 @@ void CSampleKeyHandler::OnKeyDown(int KeyCode)
 		mario->SetLevel(MARIO_LEVEL_RACCOON);
 		break;
 	case DIK_4:
-		mario->SetState(MARIO_STATE_DIE);
-		//mario->ToggleNoclip();
+		mario->ToggleNoclip();
 		break;
 	case DIK_9:
 		CGame::GetInstance()->DrawBoundingBox = !(CGame::GetInstance()->DrawBoundingBox);

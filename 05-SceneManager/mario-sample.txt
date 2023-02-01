@@ -18,6 +18,7 @@ height	720
 -100	textures\bbox.png
 -10	textures\SecretRoomBackground.png
 0	textures\mario.png
+1	textures\mario inverted.png
 10	textures\enemies.png
 20	textures\misc.png
 30	textures\Untitled.png
