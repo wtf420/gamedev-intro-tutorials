@@ -8,7 +8,6 @@
 #include "Goomba.h"
 //#include "Koopas.h"
 
-
 class CPlayScene: public CScene
 {
 protected: 
@@ -26,7 +25,7 @@ protected:
 
 	void LoadAssets(LPCWSTR assetFile);
 	
-public: 
+public:
 	CPlayScene(int id, LPCWSTR filePath);
 
 	virtual void Load();

@@ -5,14 +5,14 @@
 
 #include "Mario.h"
 #include "PlayScene.h"
+#include "worldmap.h"
 
 void CSampleKeyHandler::OnKeyDown(int KeyCode)
 {
 	//DebugOut(L"[INFO] KeyDown: %d\n", KeyCode);
 	CMario* mario = (CMario *)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer(); 
 	if (!mario->acceptKeyboardInput)
-		return;
-
+		return; else
 	switch (KeyCode)
 	{
 	case DIK_A:
@@ -77,36 +77,65 @@ void CSampleKeyHandler::OnKeyUp(int KeyCode)
 void CSampleKeyHandler::KeyState(BYTE *states)
 {
 	LPGAME game = CGame::GetInstance();
-	CMario* mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
-	if (!mario->acceptKeyboardInput)
-		return;
+	CMario* mario = dynamic_cast<CMario*>(((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer());
+	CWMario* wmario = dynamic_cast<CWMario*>(((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer());
 
-	if (game->IsKeyDown(DIK_A))
-		mario->SetHold(1); else
-		mario->SetHold(0);
+	DebugOut(L"********************************%i, %i\n", mario, wmario);
 
-	if (game->IsKeyDown(DIK_RIGHT))
+	if (wmario)
 	{
-		if (game->IsKeyDown(DIK_A))
-			mario->SetState(MARIO_STATE_RUNNING_RIGHT);
+		if (!wmario->acceptKeyboardInput) return;
+		if (game->IsKeyDown(DIK_X))
+		{
+			wmario->Enter();
+		}
 		else
-			mario->SetState(MARIO_STATE_WALKING_RIGHT);
-	}
-	else if (game->IsKeyDown(DIK_LEFT))
+			if (game->IsKeyDown(DIK_RIGHT))
+			{
+				wmario->MoveToNode(wmario->FindPossibleNode(DIRECTION_RIGHT));
+			}
+			else if (game->IsKeyDown(DIK_LEFT))
+			{
+				wmario->MoveToNode(wmario->FindPossibleNode(DIRECTION_LEFT));
+			}
+			else if (game->IsKeyDown(DIK_UP))
+			{
+				wmario->MoveToNode(wmario->FindPossibleNode(DIRECTION_UP));
+			}
+			else if (game->IsKeyDown(DIK_DOWN))
+			{
+				wmario->MoveToNode(wmario->FindPossibleNode(DIRECTION_DOWN));
+			}
+	} else if (mario)
 	{
+		if (!mario->acceptKeyboardInput) return;
 		if (game->IsKeyDown(DIK_A))
-			mario->SetState(MARIO_STATE_RUNNING_LEFT);
-		else
-			mario->SetState(MARIO_STATE_WALKING_LEFT);
-	}
-	else if (game->IsKeyDown(DIK_UP))
-	{
+			mario->SetHold(1); else
+			mario->SetHold(0);
+
+		if (game->IsKeyDown(DIK_RIGHT))
+		{
+			if (game->IsKeyDown(DIK_A))
+				mario->SetState(MARIO_STATE_RUNNING_RIGHT);
+			else
+				mario->SetState(MARIO_STATE_WALKING_RIGHT);
+		}
+		else if (game->IsKeyDown(DIK_LEFT))
+		{
+			if (game->IsKeyDown(DIK_A))
+				mario->SetState(MARIO_STATE_RUNNING_LEFT);
+			else
+				mario->SetState(MARIO_STATE_WALKING_LEFT);
+		}
+		else if (game->IsKeyDown(DIK_UP))
+		{
 			mario->SetState(MARIO_STATE_WALKING_UP);
-	}
-	else if (game->IsKeyDown(DIK_DOWN))
-	{
+		}
+		else if (game->IsKeyDown(DIK_DOWN))
+		{
 			mario->SetState(MARIO_STATE_WALKING_DOWN);
+		}
+		else
+			mario->SetState(MARIO_STATE_IDLE);
 	}
-	else
-		mario->SetState(MARIO_STATE_IDLE);
 }

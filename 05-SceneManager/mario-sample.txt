@@ -1,5 +1,5 @@
 [SETTINGS]
-start	1
+start	2
 width	720
 height	720
 
@@ -8,10 +8,9 @@ height	720
 [SCENES]
 
 0	intro.txt
-1	scene-world-1-1 final.txt
-2	scene02.txt
-3	scene01.txt	
-5	scene0005.txt
+1	scene-titlescreen.txt
+2	scene-worldmap.txt
+3	scene-world-1-1 final.txt
 
 # id	file 
 [TEXTURES]
@@ -25,3 +24,6 @@ height	720
 40	textures\hud-2.png
 50	textures\background 1-1.png
 60	textures\endstage.png
+70	textures\titlescreen.png
+80	textures\worldmap sprites.png
+90	textures\worldmap.png

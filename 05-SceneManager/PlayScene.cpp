@@ -15,6 +15,7 @@
 #include "Koopas.h"
 #include "Plant.h"
 #include "hud.h"
+#include "worldmap.h"
 
 #include "SampleKeyEventHandler.h"
 
@@ -120,6 +121,13 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		DebugOut(L"[INFO] Background has been created: %f\n", k);
 		break;
 	}
+	case OBJECT_TYPE_ANIMATED_BACKGROUND:
+	{
+		float k = (float)atof(tokens[3].c_str());
+		obj = new CAnimatedBackground(x, y, k);
+		DebugOut(L"[INFO] Background has been created: %f\n", k);
+		break;
+	}
 	case OBJECT_TYPE_MARIO:
 	{
 		if (player != NULL)
@@ -133,6 +141,20 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		DebugOut(L"[INFO] Player object has been created!\n");
 		break;
 	}
+	case OBJECT_TYPE_WORLD_MARIO:
+	{
+		if (player != NULL)
+		{
+			DebugOut(L"[ERROR] MARIO object was created before!\n");
+			return;
+		}
+		obj = new CWMario(x, y);
+		player = (CWMario*)obj;
+
+		DebugOut(L"[INFO] Player object has been created!\n");
+		break;
+	}
+	case OBJECT_TYPE_WORLD_ENEMY: obj = new CWEnemy(x, y); break;
 	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(x,y); break;
 	case OBJECT_TYPE_SUPERGOOMBA: obj = new CSuperGoomba(x, y); break;
 	case OBJECT_TYPE_KOOPAS: obj = new CKoopas(x, y); break;
@@ -369,57 +391,65 @@ void CPlayScene::Update(DWORD dt)
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
 	if (player == NULL) return; 
 
-	// Update camera to follow mario
-	float cx, cy;
-	player->GetPosition(cx, cy);
-
-	//get mario position and clamp it
-	//mario is under ground set cam to underground
-	if (cy > 205)	cy = 340; else
-		//snap to ground utill you reach highest point possible without flying
-		if (cy > -15) cy = 132; else
-			//highest point that you can fly to.
-			if (cy < -150) cy = -150;
-	if (cx > 2700) cx = 2700;
-
-	//translate it to camera coordinates
-	CGame *game = CGame::GetInstance();
-	cx -= game->GetBackBufferWidth() / 2;
-	cy -= game->GetBackBufferHeight() / 2;
-
-	float cxx, cyy;
-	game->GetCamPos(cxx, cyy);
-	//moving cam to new location
-
-	CMario* mario = dynamic_cast<CMario*>(player);
-	//snap camera to underground
-	if (cy >= 340) cyy = 340; else
-	//slowing pan camera to new location
+	if (dynamic_cast<CWMario*>(player))
 	{
-		if (cy < cyy)
-			cyy -= 10;
+		float cx, cy;
+		cx = -CGame::GetInstance()->GetBackBufferWidth() / 2;
+		cy = -CGame::GetInstance()->GetBackBufferHeight() / 2;
+		CGame::GetInstance()->SetCamPos(cx, cy);
+	}
+	else
+	{
+		// Update camera to follow mario
+		float cx, cy;
+		player->GetPosition(cx, cy);
+
+		//get mario position and clamp it
+		//mario is under ground set cam to underground
+		if (cy > 205)	cy = 340; else
+			//snap to ground utill you reach highest point possible without flying
+			if (cy > -15) cy = 132; else
+				//highest point that you can fly to.
+				if (cy < -150) cy = -150;
+		if (cx > 2700) cx = 2700;
+
+		//translate it to camera coordinates
+		cx -= CGame::GetInstance()->GetBackBufferWidth() / 2;
+		cy -= CGame::GetInstance()->GetBackBufferHeight() / 2;
+
+		float cxx, cyy;
+		CGame::GetInstance()->GetCamPos(cxx, cyy);
+		//moving cam to new location
+		//snap camera to underground
+		if (cy >= 340) cyy = 340; else
+			//slowing pan camera to new location
+		{
+			if (cy < cyy)
+				cyy -= 10;
+			if (cy > cyy)
+				cyy += 10;
+			if (abs(cyy - cy) < 10) cyy = cy;
+		}
+		cxx = cx;
+
+		/*
+		* CMario* mario = dynamic_cast<CMario*>(player);
+		if (mario && (mario->GetLevel() == MARIO_LEVEL_RACCOON && mario->IsMaxPower()))
+		{
+			if (cy < cyy)
+				cyy -= 10;
+		}
 		if (cy > cyy)
 			cyy += 10;
 		if (abs(cyy - cy) < 10) cyy = cy;
+		*/
+
+		CGame::GetInstance()->SetCamPos(cxx, cyy);
 	}
-	cxx = cx;
 
-	/*
-	* CMario* mario = dynamic_cast<CMario*>(player);
-	if (mario && (mario->GetLevel() == MARIO_LEVEL_RACCOON && mario->IsMaxPower()))
-	{
-		if (cy < cyy)
-			cyy -= 10;
-	}
-	if (cy > cyy)
-		cyy += 10;
-	if (abs(cyy - cy) < 10) cyy = cy;
-	*/
-
-	CGame::GetInstance()->SetCamPos(cxx, cyy);
-
-	CGame::GetInstance()->GetCamPos(cx, cy);
-	this->hud->SetPosition(cx + 76.0f + 10.0f, cy + (game->GetBackBufferHeight() - 28.0f / 2) - 20.0f);
+	float mx, my;
+	CGame::GetInstance()->GetCamPos(mx, my);
+	this->hud->SetPosition(mx + 76.0f + 10.0f, my + (CGame::GetInstance()->GetBackBufferHeight() - 28.0f / 2) - 20.0f);
 	PurgeDeletedObjects();
 }
 

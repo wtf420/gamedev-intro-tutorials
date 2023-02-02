@@ -66,7 +66,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		else if (!isHolding && holdingObject != NULL)
 		{
 			kick_start = GetTickCount64();
-			if (dynamic_cast<CKoopas*>(holdingObject) || dynamic_cast<CKoopas*>(holdingObject))
+			if (dynamic_cast<CSuperKoopas*>(holdingObject) || dynamic_cast<CKoopas*>(holdingObject))
 				holdingObject->SetState(KOOPAS_STATE_MOVING_SHELL);
 			holdingObject = NULL;
 		}

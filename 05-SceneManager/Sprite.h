@@ -19,6 +19,8 @@ public:
 	CSprite(int id, int left, int top, int right, int bottom, LPTEXTURE tex);
 
 	void Draw(float x, float y);
+	int Width() { return right - left; }
+	int Heigth() { return bottom - top; }
 };
 
 typedef CSprite* LPSPRITE;

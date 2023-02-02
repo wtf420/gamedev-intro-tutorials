@@ -56,7 +56,8 @@ public:
 class CPlatform3 : public CGameObject
 {
 public:
-	float length, height, spriteId;
+	float length, height;
+	float spriteId;
 	CPlatform3(float x, float y,
 		float a, float b) :CGameObject(x, y)
 	{
@@ -83,8 +84,9 @@ public:
 class CWarpPipe : public CGameObject
 {
 public:
-	float length, height, spriteId;
+	float length, height;
 	float exitX, exitY;
+	float spriteId;
 	CWarpPipe(float x, float y,
 		float a, float b, float f, float ex, float ey) :CGameObject(x, y)
 	{
