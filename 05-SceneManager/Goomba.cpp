@@ -46,7 +46,10 @@ void CGoomba::OnCollisionWith(LPCOLLISIONEVENT e)
 	if (dynamic_cast<CKoopas*>(e->obj))
 	{
 		if (dynamic_cast<CKoopas*>(e->obj)->GetState() == KOOPAS_STATE_MOVING_SHELL)
+		{
+			mario-> AddScore(this->x, this->y, 400);
 			this->SetState(GOOMBA_STATE_ATTACKED);
+		}
 		return;
 	}
 
@@ -203,7 +206,10 @@ void CSuperGoomba::OnCollisionWith(LPCOLLISIONEVENT e)
 	if (dynamic_cast<CKoopas*>(e->obj))
 	{
 		if (dynamic_cast<CKoopas*>(e->obj)->GetState() == KOOPAS_STATE_MOVING_SHELL)
+		{
+			mario->AddScore(this->x, this->y, 400);
 			this->SetState(GOOMBA_STATE_ATTACKED);
+		}
 		return;
 	}
 

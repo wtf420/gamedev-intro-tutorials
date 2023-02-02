@@ -18,6 +18,7 @@ void CRCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			vy = 0;
 			CMario* mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
 			mario->AddCoin();
+			mario->AddScore(this->x, this->y, 200);
 			isDeleted = true;
 		}
 

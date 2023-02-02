@@ -12,8 +12,7 @@ class CPlayScene: public CScene
 {
 protected: 
 	// A play scene has to have player, right? 
-	LPGAMEOBJECT player;	
-	LPGAMEOBJECT hud;
+	LPGAMEOBJECT player;
 
 	vector<LPGAMEOBJECT> objects;
 
@@ -26,6 +25,8 @@ protected:
 	void LoadAssets(LPCWSTR assetFile);
 	
 public:
+	LPGAMEOBJECT hud;
+
 	CPlayScene(int id, LPCWSTR filePath);
 
 	virtual void Load();

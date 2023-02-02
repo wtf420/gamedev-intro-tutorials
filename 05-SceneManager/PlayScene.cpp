@@ -391,14 +391,14 @@ void CPlayScene::Update(DWORD dt)
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
 	if (player == NULL) return; 
 
-	if (dynamic_cast<CWMario*>(player))
+	if (!dynamic_cast<CMario*>(player))
 	{
 		float cx, cy;
 		cx = -CGame::GetInstance()->GetBackBufferWidth() / 2;
 		cy = -CGame::GetInstance()->GetBackBufferHeight() / 2;
 		CGame::GetInstance()->SetCamPos(cx, cy);
 	}
-	else
+	else if (player->GetState() != MARIO_STATE_DIE)
 	{
 		// Update camera to follow mario
 		float cx, cy;
@@ -406,12 +406,13 @@ void CPlayScene::Update(DWORD dt)
 
 		//get mario position and clamp it
 		//mario is under ground set cam to underground
-		if (cy > 205)	cy = 340; else
+		if (cy > 220)	cy = 340; else
 			//snap to ground utill you reach highest point possible without flying
 			if (cy > -15) cy = 132; else
 				//highest point that you can fly to.
 				if (cy < -150) cy = -150;
-		if (cx > 2700) cx = 2700;
+		if (cx > 2700) cx = 2700; else
+			if (cx < 170) cx = 170;
 
 		//translate it to camera coordinates
 		cx -= CGame::GetInstance()->GetBackBufferWidth() / 2;
@@ -421,9 +422,13 @@ void CPlayScene::Update(DWORD dt)
 		CGame::GetInstance()->GetCamPos(cxx, cyy);
 		//moving cam to new location
 		//snap camera to underground
-		if (cy >= 340) cyy = 340; else
+		int a = 340 - CGame::GetInstance()->GetBackBufferHeight() / 2;
+		int b = 132 - CGame::GetInstance()->GetBackBufferHeight() / 2;
+		if (cy >= a) cyy = a; else
+			if (cy < a && cy >= b) cyy = b; else
 			//slowing pan camera to new location
 		{
+			DebugOut(L"CY: %f\n", cy);
 			if (cy < cyy)
 				cyy -= 10;
 			if (cy > cyy)
@@ -463,6 +468,7 @@ void CPlayScene::Render()
 	for (int i = 0; i < objects.size(); i++)
 		if (IsGameObjectInCamera(objects[i]))
 			objects[i]->Render();
+	if (CGame::GetInstance()->GetCurrentScene()->id != 1)
 	this->hud->Render();
 }
 

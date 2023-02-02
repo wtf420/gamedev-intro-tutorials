@@ -1,6 +1,7 @@
 #include "hud.h"
 
 void CHud::Render()
+//This also works as update.
 {
 	float l = x - HUD_BBOX_WIDTH / 2.0f;
 	float t = y - HUD_BBOX_HEIGHT / 2.0f;
@@ -21,7 +22,10 @@ void CHud::Render()
 	RenderNumber(l + 132.0f, t + 8.0f, coinCount, 2);
 	RenderNumber(l + 52.0f, t + 16.0f, score, 7);
 	RenderNumber(l + 125.0f, t + 16.0f, timer, 3);
-	RenderPowerMeter(l + 52.0f, t + 8.0f, 0);
+	if (dynamic_cast<CMario*>(mario))
+		RenderPowerMeter(l + 52.0f, t + 8.0f, dynamic_cast<CMario*>(mario)->power / MARIO_POWER_LIMIT * 7);
+	else 
+		RenderPowerMeter(l + 52.0f, t + 8.0f, 0);
 }
 
 void CHud::GetBoundingBox(float& l, float& t, float& r, float& b)
@@ -108,6 +112,15 @@ void CHud::SetCoinCount(int i)
 	coinCount = i;
 }
 
+void CHud::SetScore(int i)
+{
+	score = i;
+}
+void CHud::SetLives(int i)
+{
+	livesCount = i;
+}
+
 void CHud::RenderPowerMeter(float a, float b, int p)
 {
 	a += 4.0f; b += 3.0f;
@@ -131,7 +144,6 @@ void CHud::RenderPowerMeter(float a, float b, int p)
 	a += 5.0f;
 	if (p == 7)
 	{
-		a += 7.0f;
 		powerArrow = CSprites::GetInstance()->Get(ID_SPRITE_POWER_WHITE);
 		powerArrow->Draw(a, b);
 	}
@@ -141,3 +153,85 @@ void CHud::RenderPowerMeter(float a, float b, int p)
 		powerArrow->Draw(a, b);
 	}
 }
+
+//********************************************************************************
+//
+//********************************************************************************
+
+void ScoreFX::Render()
+{
+	LPSPRITE sprite = CSprites::GetInstance()->Get(GetAniId());
+	sprite->Draw(x, y);
+	//RenderBoundingBox();
+}
+
+int ScoreFX::GetAniId()
+{
+	return ID_SPRITE_SCORE + amount;
+}
+
+void ScoreFX::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+{
+	if (currentPba != -1)
+	{
+		x += vx * dt;
+		y += vy * dt;
+
+		PbaTimer += dt;
+		//condition to switch step / pba
+		if (PbaTimer >= timetillnextPba)
+		{
+			PbaStep++;
+			StartPBA(currentPba, PbaStep);
+		}
+	}
+	else
+	{
+		//insert normal update here
+	}
+}
+
+void ScoreFX::StartPBA(int pba, int step)
+{
+	switch (pba)
+	{
+	case 1:
+		currentPba = 1;
+		PbaStep = 1;
+		PbaTimer = 0;
+		GetPopupPBA(step);
+		break;
+	default:
+		break;
+	}
+}
+
+void ScoreFX::GetPopupPBA(int step)
+{
+	switch (step)
+	{
+	case 1:
+	{
+		PbaStep = 1;
+		PbaTimer = 0;
+
+		timetillnextPba = 500;
+		vx = 0;
+		vy = -0.05f;
+		break;
+	}
+	//end of PBA
+	default:
+		Delete();
+		break;
+	}
+}
+
+void ScoreFX::GetBoundingBox(float& l, float& t, float& r, float& b)
+{
+	l = x - 18.0f / 2;
+	t = y - 10.0f / 2;
+	r = l + 18.0f;
+	b = t + 10.0f;
+}
+

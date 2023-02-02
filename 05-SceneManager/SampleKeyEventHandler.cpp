@@ -80,8 +80,6 @@ void CSampleKeyHandler::KeyState(BYTE *states)
 	CMario* mario = dynamic_cast<CMario*>(((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer());
 	CWMario* wmario = dynamic_cast<CWMario*>(((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer());
 
-	DebugOut(L"********************************%i, %i\n", mario, wmario);
-
 	if (wmario)
 	{
 		if (!wmario->acceptKeyboardInput) return;

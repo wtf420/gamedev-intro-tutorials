@@ -79,6 +79,11 @@
 
 #define ID_ANI_MARIO_DIE 999
 #define ID_ANI_MARIO_PIPE 690
+#define ID_ANI_MARIO_LEVEL_UPDOWN_BIG 990
+#define ID_ANI_MARIO_LEVEL_UP_SMALL_RIGHT 991
+#define ID_ANI_MARIO_LEVEL_UP_SMALL_LEFT 992
+#define ID_ANI_MARIO_LEVEL_DOWN_SMALL_RIGHT 993
+#define ID_ANI_MARIO_LEVEL_DOWN_SMALL_LEFT 994
 
 // SMALL MARIO
 #define ID_ANI_MARIO_SMALL_IDLE_RIGHT 1100
@@ -179,7 +184,7 @@
 #define MARIO_SMALL_BBOX_WIDTH  12
 #define MARIO_SMALL_BBOX_HEIGHT 16
 
-#define MARIO_UNTOUCHABLE_TIME 250
+#define MARIO_UNTOUCHABLE_TIME 300
 #define MARIO_RACCOONSPAMJUMP_TIME 500
 #define MARIO_ATTACK_TIME 375
 #define MARIO_POWER_LIMIT 50
@@ -187,7 +192,6 @@
 class CMario : public CGameObject
 {
 	BOOLEAN isSitting, isNoclipping;
-	float power;
 	float maxVx;
 	float maxVy;
 	float ax;				// acceleration on x 
@@ -205,7 +209,7 @@ class CMario : public CGameObject
 	int colliable = 1;
 	ULONGLONG untouchable_start, raccoonSpamJump_start, attack_start, kick_start;
 	BOOLEAN isOnPlatform;
-	int coin; 
+	int coin, score; 
 
 	LPGAMEOBJECT currentPlatform;
 	LPGAMEOBJECT holdingObject = NULL;
@@ -230,6 +234,11 @@ class CMario : public CGameObject
 	void GetDiePBA(int step);
 	void GetPipeDownPBA(int step);
 	void GetPipeUpPBA(int step);
+	void GetFinishPBA(int step);
+	void GetLevelUpToRaccoonPBA(int step);
+	void GetLevelUpToBigPBA(int step);
+	void GetLevelDownFromRaccoonPBA(int step);
+	void GetLevelDownFromBigPBA(int step);
 
 public:
 	int acceptKeyboardInput = 1;
@@ -237,6 +246,7 @@ public:
 	int isHolding;
 	int isWarping;
 	float warptoX, warptoY;
+	float power;
 
 	CMario(float x, float y) : CGameObject(x, y)
 	{
@@ -254,6 +264,7 @@ public:
 		attack_start = -1;
 		isOnPlatform = false;
 		coin = 0;
+		score = 0;
 		isNoclipping = false;
 		isHolding = true;
 		power = 0;
@@ -274,9 +285,10 @@ public:
 		return (power >= MARIO_POWER_LIMIT);
 	}
 
-	int IsBlocking() { return (state != MARIO_STATE_DIE && untouchable==0); }
+	int IsBlocking() { return (state != MARIO_STATE_DIE && untouchable == 0); }
 
-	void AddCoin() { coin++; };
+	void AddCoin();
+	void AddScore(float x, float y, int amount);
 
 	void OnNoCollision(DWORD dt);
 	void OnCollisionWith(LPCOLLISIONEVENT e);

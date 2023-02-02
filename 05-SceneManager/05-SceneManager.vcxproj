@@ -167,6 +167,7 @@
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="Sprites.cpp" />
     <ClCompile Include="Textures.cpp" />
+    <ClCompile Include="titlescreen.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="worldmap.cpp" />
   </ItemGroup>
@@ -199,6 +200,7 @@
     <ClInclude Include="Sprites.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Textures.h" />
+    <ClInclude Include="titlescreen.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="worldmap.h" />
   </ItemGroup>

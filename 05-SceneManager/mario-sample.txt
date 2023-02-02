@@ -1,5 +1,5 @@
 [SETTINGS]
-start	2
+start	3
 width	720
 height	720
 
@@ -8,7 +8,7 @@ height	720
 [SCENES]
 
 0	intro.txt
-1	scene-titlescreen.txt
+1	scene-title-screen.txt
 2	scene-worldmap.txt
 3	scene-world-1-1 final.txt
 

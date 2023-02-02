@@ -72,7 +72,10 @@ void CBrickWithP::GetBoundingBox(float& l, float& t, float& r, float& b)
 
 void CBrickWithP::Attacked()
 {
-	attacked = true;
-	PowerBlock* p = new PowerBlock(this->x, this->y - 16.0f);
-	((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->Add(p);
+	if (!attacked)
+	{
+		attacked = true;
+		PowerBlock* p = new PowerBlock(this->x, this->y - 16.0f);
+		((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->Add(p);
+	}
 }

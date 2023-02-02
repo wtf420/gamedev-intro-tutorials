@@ -88,7 +88,23 @@ void CWMario::MoveToNode(int n)
 
 void CWMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	nodeCoorY[6] = -93.0f;
+	float X[21] = { -88, -56, -56, -24, 8, 40, 72,
+												8, 40, 72,
+								-56, -24, 8,
+								-56, -24, 8, 40, 72,
+								-56, -24, 8 };
+
+	float Y[21] = { -61, -61, -93, -93, -93, -93,-93,
+												-61, -61, -61,
+								-29, -29, -29,
+								3, 3, 3, 3, 3,
+								35, 35, 35 };
+	for (int i = 0; i < 21; i++)
+	{
+		nodeCoorX[i] = X[i];
+		nodeCoorY[i] = Y[i];
+	}
+
 	if (currentPba != -1)
 	{
 		x += vx * dt;

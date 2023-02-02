@@ -2,6 +2,7 @@
 #include "PlayScene.h"
 #include "debug.h"
 #include <string>
+#include "CBackground.h"
 
 /********************************************************************************************/
 
@@ -49,6 +50,8 @@ void CPlant::Attack()
 }
 void CPlant::Die()
 {
+	CBackgroundFX* fx = new CBackgroundFX(this->x, this->y, ID_ANI_POP_SMOKE_FX, 1000);
+	((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->Add(fx);
 	isDeleted = true;
 }
 
@@ -213,6 +216,8 @@ void CPlant2::Attack()
 }
 void CPlant2::Die()
 {
+	CBackgroundFX* fx = new CBackgroundFX(this->x, this->y, ID_ANI_POP_SMOKE_FX, 1000);
+	((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->Add(fx);
 	isDeleted = true;
 }
 
