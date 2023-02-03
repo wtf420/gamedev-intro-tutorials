@@ -28,7 +28,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		PbaTimer += dt;
 		if (PbaTimer >= timetillnextPba)
 		{
-			DebugOut(L"Step %i, %i\n", currentPba, PbaStep);
 			PbaStep++;
 			StartPBA(currentPba, PbaStep);
 		}
@@ -51,7 +50,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		vy += ay * dt;
 		vx += ax * dt;
 
-		if (this->y > 210 && this->y < 230)
+		if (this->y > 200 && this->y < 230)
 		{
 			this->SetState(MARIO_STATE_DIE);
 		}
@@ -131,6 +130,11 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			{
 				if (dynamic_cast<CBrick*>(attack->at(i)))
 					attack->at(i)->Delete();
+				else if (dynamic_cast<CMyth*>(attack->at(i)))
+				{
+					CMyth* myth = dynamic_cast<CMyth*>(attack->at(i));
+					myth->Interact();
+				}
 				else if (dynamic_cast<CPlant*>(attack->at(i)))
 				{
 					CPlant* plant = dynamic_cast<CPlant*>(attack->at(i));

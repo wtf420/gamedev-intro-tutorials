@@ -74,6 +74,12 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	float timeScale;
 	CGame::GetInstance()->GetTimeScale(timeScale);
+
+	if (this->y > 200 && this->y < 230)
+	{
+		this->Delete();
+	}
+
 	if (timeScale == 0.0f)
 	{
 		if (!timeStopped)
@@ -97,7 +103,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		vx += ax * dt;
 	}
 
-	if (state == KOOPAS_STATE_WALKING && currentPlatform)
+	if (state == KOOPAS_STATE_WALKING && currentPlatform != NULL)
 	{
 		if (dynamic_cast<CBrickWithCoin*>(currentPlatform))
 		{

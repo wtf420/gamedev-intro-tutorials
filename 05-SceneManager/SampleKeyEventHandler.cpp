@@ -5,6 +5,7 @@
 
 #include "Mario.h"
 #include "PlayScene.h"
+#include "titlescreen.h"
 #include "worldmap.h"
 
 void CSampleKeyHandler::OnKeyDown(int KeyCode)
@@ -79,7 +80,16 @@ void CSampleKeyHandler::KeyState(BYTE *states)
 	LPGAME game = CGame::GetInstance();
 	CMario* mario = dynamic_cast<CMario*>(((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer());
 	CWMario* wmario = dynamic_cast<CWMario*>(((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer());
+	CTSMario* ctsmario = dynamic_cast<CTSMario*>(((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer());
 
+
+	if (ctsmario)
+	{
+		if (game->IsKeyDown(DIK_X))
+		{
+			CGame::GetInstance()->InitiateSwitchScene(2);
+		}
+	} else
 	if (wmario)
 	{
 		if (!wmario->acceptKeyboardInput) return;

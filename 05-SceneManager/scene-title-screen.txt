@@ -4,11 +4,23 @@ mario.txt
 titlescreen.txt
 background.txt
 hud.txt
+myth.txt
+goomba.txt
+koopas.txt
 #
 [OBJECTS]
 # type	x	y	extra_settings per object type
 # type: 0 = Mario , 1 = Brick, 2 = Goomba, 3 = Koopas
 # See OBJECT_TYPE constants in AssetIDs.h
+
+#CENTER: 200 LEFT BUSH: 130 RIGHTBUSH: 270
+
+100	0	150	100069
+
+#TITLE CARD
+23	200	-60	19011
+23	205	-15	19010
+#100	200	160	190009
 
 #BUSHES
 100	104	148	190005
@@ -18,18 +30,21 @@ hud.txt
 #100	200	100	190002
 
 # MARIO
-0	200	0
+-2	270	165
+
+#OTHER FALLING STUFF
+19	100	-20	#MUSHROOM
+20	150	-20	#LEAF
+21	170	-20	#GOOMBA
+22	200	-20	#SHELL
 
 #CAKEROLL CLOUD
 100	120	50	190003
 100	300	30	190003
 100	80	80	190004
 
-#TITLE CARD
-100	200	60	190010
-101	205	115	19010
-100	200	160	190009
-
 #PLATFORM
 13	200	200	256	38	190001
+
+100	-330	150	100069
 

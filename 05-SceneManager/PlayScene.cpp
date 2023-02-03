@@ -16,6 +16,7 @@
 #include "Plant.h"
 #include "hud.h"
 #include "worldmap.h"
+#include "titlescreen.h"
 
 #include "SampleKeyEventHandler.h"
 
@@ -121,6 +122,13 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		DebugOut(L"[INFO] Background has been created: %f\n", k);
 		break;
 	}
+	case OBJECT_TYPE_TITLESCREEN_BACKGROUND:
+	{
+		float k = (float)atof(tokens[3].c_str());
+		obj = new CTSBackground(x, y, k);
+		DebugOut(L"[INFO] Background has been created: %f\n", k);
+		break;
+	}
 	case OBJECT_TYPE_ANIMATED_BACKGROUND:
 	{
 		float k = (float)atof(tokens[3].c_str());
@@ -154,6 +162,19 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		DebugOut(L"[INFO] Player object has been created!\n");
 		break;
 	}
+	case OBJECT_TYPE_TITLESCREEN_MARIO:
+	{
+		if (player != NULL)
+		{
+			DebugOut(L"[ERROR] MARIO object was created before!\n");
+			return;
+		}
+		obj = new CTSMario(x, y);
+		player = (CTSMario*)obj;
+
+		DebugOut(L"[INFO] Player object has been created!\n");
+		break;
+	}
 	case OBJECT_TYPE_WORLD_ENEMY: obj = new CWEnemy(x, y); break;
 	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(x,y); break;
 	case OBJECT_TYPE_SUPERGOOMBA: obj = new CSuperGoomba(x, y); break;
@@ -165,6 +186,10 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_COIN: obj = new CCoin(x, y); break;
 	case OBJECT_TYPE_PLANT:	obj = new CPlant(x, y + 24); break;
 	case OBJECT_TYPE_PLANT_2:	obj = new CPlant2(x, y + 24); break;
+	case OBJECT_TYPE_TITLESCREEN_MUSHROOM:	obj = new CTSMushroom(x, y); break;
+	case OBJECT_TYPE_TITLESCREEN_LEAF:	obj = new CTSLeaf(x, y); break;
+	case OBJECT_TYPE_TITLESCREEN_GOOMBA:	obj = new CTSGoomba(x, y); break;
+	case OBJECT_TYPE_TITLESCREEN_TURTLE_SHELL:	obj = new CTSTurtleShell(x, y); break;
 	case OBJECT_TYPE_MYTH_COIN:
 	{
 
@@ -394,11 +419,19 @@ void CPlayScene::Update(DWORD dt)
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
 	if (player == NULL) return; 
 
-	if (!dynamic_cast<CMario*>(player))
+	if (dynamic_cast<CWMario*>(player))
 	{
 		float cx, cy;
 		cx = -CGame::GetInstance()->GetBackBufferWidth() / 2;
 		cy = -CGame::GetInstance()->GetBackBufferHeight() / 2;
+		CGame::GetInstance()->SetCamPos(cx, cy);
+	}
+	else if (dynamic_cast<CTSMario*>(player))
+	{
+		float cx = 200;
+		float cy = 132;
+		cx -= CGame::GetInstance()->GetBackBufferWidth() / 2;
+		cy -= CGame::GetInstance()->GetBackBufferHeight() / 2;
 		CGame::GetInstance()->SetCamPos(cx, cy);
 	}
 	else if (player->GetState() != MARIO_STATE_DIE)
