@@ -152,6 +152,10 @@ void CGame::Init(HWND hWnd, HINSTANCE hInstance)
 
 	DebugOut((wchar_t*)L"[INFO] InitDirectX has been successful\n");
 
+	coincount = 0;
+	livescount = 3;
+	score = 0;
+
 	return;
 }
 
@@ -527,9 +531,21 @@ void CGame::SwitchScene()
 
 void CGame::InitiateSwitchScene(int scene_id)
 {
+	if (scene_id == 1)
+	{
+		coincount = 0;
+		livescount = 3;
+		score = 0;
+	}
 	next_scene = scene_id;
 }
 
+void CGame::SetStuff(int c, int l, int s)
+{
+	coincount = c;
+	livescount = l;
+	score = s;
+}
 
 void CGame::_ParseSection_TEXTURES(string line)
 {

@@ -99,11 +99,21 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 	if (state == KOOPAS_STATE_WALKING && currentPlatform)
 	{
+		if (dynamic_cast<CBrickWithCoin*>(currentPlatform))
+		{
+			CBrickWithCoin* u = dynamic_cast<CBrickWithCoin*>(currentPlatform);
+			float ux, uy;
+			u->GetPosition(ux, uy);
+			if ((x < ux - 8.0f && vx < 0) || (x > ux + 8.0f && vx > 0))
+			{
+				vx = -vx;
+			}
+		}
 		if (dynamic_cast<CPlatformOneWay*>(currentPlatform))
 		{
 			CPlatformOneWay* u = dynamic_cast<CPlatformOneWay*>(currentPlatform);
 			float left = u->GetLeftPosition();
-			if (x < left || x > left + u->length)
+			if ((x < left && vx < 0) || (x > left + u->length && vx > 0))
 			{
 				vx = -vx;
 			}
@@ -112,7 +122,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 			CPlatform3* u = dynamic_cast<CPlatform3*>(currentPlatform);
 			float left = u->GetLeftPosition();
-			if (x < left || x > left + u->length)
+			if ((x < left && vx < 0) || (x > left + u->length && vx > 0))
 			{
 				vx = -vx;
 			}
@@ -122,7 +132,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			CPlatform2* u = dynamic_cast<CPlatform2*>(currentPlatform);
 			float ux, uy;
 			u->GetPosition(ux, uy);
-			if (x < ux || x > ux + u->length)
+			if ((x < ux) && (vx < 0) || (x > ux + u->length && vx > 0))
 				vx = -vx;
 		}
 		else if (dynamic_cast<CPlatform*>(currentPlatform))
@@ -131,7 +141,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			float ux, uy, l;
 			l = u->length * 16.0f;
 			u->GetPosition(ux, uy);
-			if (x < ux - 8.0f || x > ux - 8 + l)
+			if ((x < ux - 8.0f && vx < 0) || (x > ux - 8.0f + l && vx > 0))
 				vx = -vx;
 		}
 	}

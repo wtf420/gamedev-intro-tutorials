@@ -108,11 +108,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			untouchable_start = 0;
 			untouchable = 0;
 		}
-		if (GetTickCount64() - attack_start > MARIO_ATTACK_TIME)
-		{
-			attack_start = 0;
-			attacking = 0;
-		}
 		if (GetTickCount64() - raccoonSpamJump_start <= MARIO_RACCOONSPAMJUMP_TIME)
 		{
 			maxVy = MARIO_MAX_GRAVITY;
@@ -129,10 +124,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				StartPBA(2, 1); else
 				StartPBA(3, 1);
 		}
-
 		if (attacking)
 		{
-			vector<LPGAMEOBJECT>* attack = Attack(10.0f, 0.0f);
+			vector<LPGAMEOBJECT>* attack = Attack(20.0f, 0.0f);
 			for (int i = 0; i < attack->size(); i++)
 			{
 				if (dynamic_cast<CBrick*>(attack->at(i)))
@@ -174,15 +168,18 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				{
 					CSuperKoopas* koopas = dynamic_cast<CSuperKoopas*>(attack->at(i));
 					koopas->Attacked();
-					if (koopas->GetState() == GOOMBA_STATE_SUPER_WALKING)
+					if (koopas->GetState() == KOOPAS_STATE_FLYING)
 						AddScore(this->x, this->y, 100);
 				}
 				else if (dynamic_cast<CBrickWithCoin*>(attack->at(i)))
 				{
-					CBackgroundFX* fx = new CBackgroundFX(this->x, this->y, ID_ANI_POP_SMOKE_FX, 1000);
-					((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->Add(fx);
 					CBrickWithCoin* brick = dynamic_cast<CBrickWithCoin*>(attack->at(i));
 					brick->Delete();
+
+					float bx, by;
+					brick->GetPosition(bx, by);
+					CBackgroundFX* fx = new CBackgroundFX(bx, by, ID_ANI_POP_SMOKE_FX, 1000);
+					((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->Add(fx);
 				}
 				else if (dynamic_cast<CBrickWithP*>(attack->at(i)))
 				{
@@ -190,6 +187,11 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					brick->Attacked();
 				}
 			}
+		}
+
+		if (GetTickCount64() - attack_start <= MARIO_ATTACK_TIME)
+		{
+			attacking = 0;
 		}
 
 		vector<LPGAMEOBJECT> coObjects2;
@@ -206,7 +208,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		CCollision::GetInstance()->Process(this, dt, &coObjects2);
 	}
 
-	std::string stddrivestring = to_string(this->y);
+	std::string stddrivestring = to_string(this->x) + " | " +to_string(this->y);
 	std::wstring widedrivestring = std::wstring(stddrivestring.begin(), stddrivestring.end());
 	const wchar_t* TargetDrive = widedrivestring.c_str();
 	DebugOutTitle(TargetDrive);
@@ -237,13 +239,19 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 	if (isWarping && dynamic_cast<CWarpPipe*>(e->obj))
 	{
 		CWarpPipe* warppipe = dynamic_cast<CWarpPipe*>(e->obj);
-		warptoX = warppipe->exitX;
-		warptoY = warppipe->exitY;
-		float px, py;
-		warppipe->GetPosition(px, py);
-		if (py > y)
-			StartPBA(2, 1); else
-			StartPBA(3, 1);
+		float wx, wy;
+		warppipe->GetPosition(wx, wy);
+
+		if (abs(wx - this->x) <= 10.0f)
+		{
+			warptoX = warppipe->exitX;
+			warptoY = warppipe->exitY;
+			float px, py;
+			warppipe->GetPosition(px, py);
+			if (py > y)
+				StartPBA(2, 1); else
+				StartPBA(3, 1);
+		}
 	}
 	if (dynamic_cast<CMyth*>(e->obj))
 	{
@@ -367,7 +375,15 @@ void CMario::GetDiePBA(int step)
 	}
 	default:
 		CGame::GetInstance()->SetTimeScale(1.0f);
-		CGame::GetInstance()->InitiateSwitchScene(2);
+		if (CGame::GetInstance()->GetLivesCount() == 1)
+		{
+			CGame::GetInstance()->InitiateSwitchScene(1);
+		}
+		else
+		{
+			CGame::GetInstance()->SetStuff(coin, CGame::GetInstance()->GetLivesCount() - 1, score);
+			CGame::GetInstance()->InitiateSwitchScene(2);
+		}
 		break;
 	}
 }
@@ -392,6 +408,7 @@ void CMario::GetFinishPBA(int step)
 		break;
 	}
 	default:
+		CGame::GetInstance()->SetStuff(coin, CGame::GetInstance()->GetLivesCount(), score);
 		CGame::GetInstance()->InitiateSwitchScene(2);
 		break;
 	}
@@ -658,7 +675,10 @@ void CMario::GetLevelDownFromBigPBA(int step)
 vector<LPGAMEOBJECT>* CMario::Attack(float rangeX, float rangeY)
 {
 	float ml, mt, mr, mb;
-	this->GetBoundingBox(ml, mt, mr, mb);
+	ml = this->x - rangeX;
+	mr = this->x + rangeX;
+	mt = this->y - rangeY;
+	mb = this->y + rangeY;
 
 	vector<LPGAMEOBJECT> objects = ((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetObjects();
 	vector<LPGAMEOBJECT>* results = new vector<LPGAMEOBJECT>();
@@ -669,7 +689,7 @@ vector<LPGAMEOBJECT>* CMario::Attack(float rangeX, float rangeY)
 			float l, t, r, b;
 			objects[i]->GetBoundingBox(l, t, r, b);
 
-			if ((l > mr + rangeX) || (t > mb + rangeY) || (r < ml - rangeX) || (b < mt - rangeY))
+			if ((l > mr) || (t > mb) || (r < ml) || (b < mt ))
 			{
 
 			} else
@@ -684,7 +704,6 @@ void CMario::OnCollisionWithPowerBlock(LPCOLLISIONEVENT e)
 {
 	PowerBlock* pblock = dynamic_cast<PowerBlock*>(e->obj);
 
-	// jump on top >> kill Goomba and deflect a bit 
 	if (e->ny < 0)
 	{
 		if (pblock->collidable)
@@ -716,7 +735,15 @@ void CMario::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
 	}
 	else // hit by Goomba
 	{
-		if (untouchable == 0 && attacking == 0)
+		if (attacking)
+		{
+			if (goomba->GetState() != GOOMBA_STATE_DIE)
+			{
+				AddScore(this->x, this->y, 100);
+				goomba->SetState(GOOMBA_STATE_ATTACKED);
+			}
+		} else
+		if (untouchable == 0)
 		{
 			if (goomba->GetState() != GOOMBA_STATE_DIE && goomba->GetState() != GOOMBA_STATE_ATTACKED)
 			{
@@ -765,7 +792,16 @@ void CMario::OnCollisionWithSuperGoomba(LPCOLLISIONEVENT e)
 	}
 	else // hit by Goomba
 	{
-		if (untouchable == 0 && attacking == 0)
+		if (attacking)
+		{
+			if (goomba->GetState() != GOOMBA_STATE_DIE)
+			{
+				AddScore(this->x, this->y, 100);
+				goomba->SetState(GOOMBA_STATE_ATTACKED);
+			}
+		}
+		else
+		if (untouchable == 0)
 		{
 			if (goomba->GetState() != GOOMBA_STATE_DIE && goomba->GetState() != GOOMBA_STATE_ATTACKED)
 			{
@@ -822,8 +858,13 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 			kick_start = GetTickCount64();
 			koopas->SetState(KOOPAS_STATE_MOVING_SHELL);
 		}
-		else
-		if (untouchable == 0 && attacking == 0)
+		else if (attacking)
+		{
+			koopas->Attacked();
+			if (koopas->GetState() == KOOPAS_STATE_WALKING)
+				AddScore(this->x, this->y, 100);
+		} else
+		if (untouchable == 0)
 		{
 			if (koopas->GetState() != KOOPAS_STATE_SHELL && koopas->GetState() != KOOPAS_STATE_CARRIED)
 			{
@@ -867,6 +908,11 @@ void CMario::OnCollisionWithSuperKoopas(LPCOLLISIONEVENT e)
 			Koopas->SetState(KOOPAS_STATE_WALKING);
 			vy = -MARIO_JUMP_DEFLECT_SPEED;
 			AddScore(this->x, this->y, 100);
+		} else if (attacking)
+		{
+			Koopas->Attacked();
+			if (Koopas->GetState() == KOOPAS_STATE_FLYING)
+				AddScore(this->x, this->y, 100);
 		}
 		else
 			if (Koopas->GetState() == KOOPAS_STATE_SHELL)
@@ -888,7 +934,7 @@ void CMario::OnCollisionWithSuperKoopas(LPCOLLISIONEVENT e)
 			Koopas->SetState(KOOPAS_STATE_MOVING_SHELL);
 		}
 		else
-		if (untouchable == 0 && attacking == 0)
+		if (untouchable == 0)
 		{
 			if (Koopas->GetState() != KOOPAS_STATE_DIE)
 			{
@@ -948,7 +994,11 @@ void CMario::AddScore(float x, float y, int amount)
 void CMario::OnCollisionWithPlant(LPCOLLISIONEVENT e)
 {
 	CPlant* plant = dynamic_cast<CPlant*>(e->obj);
-	if ((untouchable == 0 || attacking == 0) && (plant->isActive))
+	if (attacking)
+	{
+		plant->Die();
+	} else
+	if ((untouchable == 0) && (plant->isActive))
 		{
 		if (level == MARIO_LEVEL_RACCOON)
 		{
@@ -974,7 +1024,12 @@ void CMario::OnCollisionWithPlant(LPCOLLISIONEVENT e)
 void CMario::OnCollisionWithPlant2(LPCOLLISIONEVENT e)
 {
 	CPlant2* plant = dynamic_cast<CPlant2*>(e->obj);
-	if ((untouchable == 0 || attacking == 0) && (plant->isActive))
+	if (attacking)
+	{
+		plant->Die();
+	}
+	else
+	if ((untouchable == 0) && (plant->isActive))
 	{
 		if (level == MARIO_LEVEL_RACCOON)
 		{
@@ -1304,7 +1359,7 @@ int CMario::GetAniIdRaccoon()
 	else
 		if (!isOnPlatform)
 		{
-			if (attacking)
+			if (GetTickCount64() - attack_start < MARIO_ATTACK_ANIMATION_TIME)
 			{
 				if (nx >= 0)
 					aniId = ID_ANI_MARIO_RACCOON_ATTACK_RIGHT;
@@ -1359,7 +1414,7 @@ int CMario::GetAniIdRaccoon()
 			}
 		}
 		else {
-			if (attacking)
+			if (GetTickCount64() - attack_start < MARIO_ATTACK_ANIMATION_TIME)
 			{
 				if (nx >= 0)
 					aniId = ID_ANI_MARIO_RACCOON_ATTACK_RIGHT;
@@ -1470,6 +1525,8 @@ void CMario::Render()
 
 	if (level == MARIO_LEVEL_SMALL)
 		animations->Get(aniId)->Render(x, y);
+	else if (isSitting)
+		animations->Get(aniId)->Render(x, y - (32 - MARIO_BIG_BBOX_HEIGHT) / 2 - MARIO_SIT_HEIGHT_ADJUST);
 	else
 		animations->Get(aniId)->Render(x, y - (32 - MARIO_BIG_BBOX_HEIGHT) / 2);
 }
@@ -1526,8 +1583,7 @@ void CMario::SetState(int state)
 			{
 				attack_start = GetTickCount64();
 				attacking = 1;
-				untouchable_start = 0;
-				untouchable = 0;
+				StartUntouchable();
 				if (!isOnPlatform && vy <= 0.05f)
 				{
 					vy += -MARIO_JUMP_SPEED_Y / 2.0f;
@@ -1629,13 +1685,6 @@ void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom
 			top = y - MARIO_BIG_SITTING_BBOX_HEIGHT / 2;
 			right = left + MARIO_BIG_SITTING_BBOX_WIDTH;
 			bottom = top + MARIO_BIG_SITTING_BBOX_HEIGHT;
-		}
-		else if (attacking)
-		{
-			left = x - MARIO_ATTACK_BBOX_WIDTH / 2;
-			top = y - MARIO_BIG_BBOX_HEIGHT / 2;
-			right = left + MARIO_ATTACK_BBOX_WIDTH;
-			bottom = top + MARIO_BIG_BBOX_HEIGHT;
 		}
 		else 
 		{

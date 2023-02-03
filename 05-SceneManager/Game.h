@@ -60,6 +60,7 @@ class CGame
 	void _ParseSection_SETTINGS(string line);
 	void _ParseSection_SCENES(string line);
 
+	int coincount, livescount, score;
 public:
 	bool DrawBoundingBox = false;
 
@@ -89,7 +90,10 @@ public:
 	int IsKeyDown(int KeyCode);
 	void ProcessKeyboard();
 	void SetKeyHandler(LPKEYEVENTHANDLER handler) { keyHandler = handler; }
-
+	void SetStuff(int c, int l, int s);
+	int GetLivesCount() { return livescount; };
+	int GetCoinCount() { return coincount; };
+	int GetScore() { return score; };
 
 	ID3D10Device* GetDirect3DDevice() { return this->pD3DDevice; }
 	IDXGISwapChain* GetSwapChain() { return this->pSwapChain; }

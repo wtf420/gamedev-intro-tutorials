@@ -148,9 +148,6 @@ bool CPlantBullet::isInsideCamera()
 	float h = CGame::GetInstance()->GetBackBufferHeight() / 2.0f;
 	cx += w;
 	cy += h;
-	DebugOut(L"%f, %f, %f, %f\n", cx, cy, w, h);
-	DebugOut(L"%f, %f, %f, %f\n", l, t, r, b);
-	DebugOut(L"%f, %f\n", l, cx + w);
 	//Once the bullet is out of camera it will stop updating position, so we plan ahead
 	if ((l + 1.0f > cx + w) || (t + 1.0f > cy + w) || (r - 1.0f < cx - w) || (b - 1.0f < cy - w))
 		return false;

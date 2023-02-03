@@ -359,6 +359,9 @@ void CPlayScene::Load()
 		}
 	}
 	CHud* hud = new CHud(100.0f, 100.0f);
+	hud->SetCoinCount(CGame::GetInstance()->GetCoinCount());
+	hud->SetLives(CGame::GetInstance()->GetLivesCount());
+	hud->SetScore(CGame::GetInstance()->GetScore());
 	this->hud = hud;
 	f.close();
 
@@ -403,12 +406,14 @@ void CPlayScene::Update(DWORD dt)
 		// Update camera to follow mario
 		float cx, cy;
 		player->GetPosition(cx, cy);
+		float cxx, cyy;
+		CGame::GetInstance()->GetCamPos(cxx, cyy);
 
 		//get mario position and clamp it
 		//mario is under ground set cam to underground
 		if (cy > 220)	cy = 340; else
-			//snap to ground utill you reach highest point possible without flying
-			if (cy > -15) cy = 132; else
+			//snap to ground utill you reach highest point possible without flying, except when falling down
+			if (cy > -15 && cy < cyy + CGame::GetInstance()->GetBackBufferHeight() / 2) cy = 132; else
 				//highest point that you can fly to.
 				if (cy < -150) cy = -150;
 		if (cx > 2700) cx = 2700; else
@@ -418,8 +423,6 @@ void CPlayScene::Update(DWORD dt)
 		cx -= CGame::GetInstance()->GetBackBufferWidth() / 2;
 		cy -= CGame::GetInstance()->GetBackBufferHeight() / 2;
 
-		float cxx, cyy;
-		CGame::GetInstance()->GetCamPos(cxx, cyy);
 		//moving cam to new location
 		//snap camera to underground
 		int a = 340 - CGame::GetInstance()->GetBackBufferHeight() / 2;

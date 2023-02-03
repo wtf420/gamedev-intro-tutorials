@@ -4,6 +4,7 @@
 #include "Animation.h"
 #include "Animations.h"
 #include "PlayScene.h"
+#include "Debug.h"
 
 #define ID_ANI_PLANT 8100
 #define ID_ANI_PLANT_LEFT_DOWN (ID_ANI_PLANT + 0)
@@ -23,7 +24,7 @@
 #define PLANT_ATTACK_COOLDOWN	2500
 
 #define ID_ANI_PLANT_BULLET 8200
-#define PLANT_BULLET_SPEED 0.1f
+#define PLANT_BULLET_SPEED 0.05f
 #define PLANT_BULLET_BBOX_WIDTH 8
 #define PLANT_BULLET_BBOX_HEIGHT 8
 
@@ -32,13 +33,14 @@ public:
 	CMario* mario;
 	CPlantBullet(float x, float y) : CGameObject(x, y) {
 		mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
-
 		float mx, my;
 		mario->GetPosition(mx, my);
 
-		float dis = sqrt(abs(mx - this->x) * abs(mx - this->x) + abs(mx - this->y) * abs(mx - this->y));
-		vx = (mx - x) / (dis / PLANT_BULLET_SPEED);
-		vy = (my - y) / (dis / PLANT_BULLET_SPEED);
+		float dis = sqrt(abs(mx - this->x) * abs(mx - this->x) + abs(my - this->y) * abs(my - this->y));
+		float t = dis / PLANT_BULLET_SPEED;
+		vx = (mx - this->x) / t;
+		vy = (my - this->y) / t;
+		DebugOut(L"vx: %f, vy: %f\n", dis, dis);
 	}
 	virtual int IsCollidable() { return 1; };
 	virtual int IsBlocking() { return 0; }
