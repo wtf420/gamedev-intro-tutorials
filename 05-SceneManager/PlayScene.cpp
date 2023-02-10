@@ -175,6 +175,11 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		DebugOut(L"[INFO] Player object has been created!\n");
 		break;
 	}
+	case OBJECT_TYPE_TITLESCREEN_LUIGI:
+	{
+		obj = new CTSLuigi(x, y);
+		break;
+	}
 	case OBJECT_TYPE_WORLD_ENEMY: obj = new CWEnemy(x, y); break;
 	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(x,y); break;
 	case OBJECT_TYPE_SUPERGOOMBA: obj = new CSuperGoomba(x, y); break;
@@ -192,30 +197,17 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_TITLESCREEN_TURTLE_SHELL:	obj = new CTSTurtleShell(x, y); break;
 	case OBJECT_TYPE_MYTH_COIN:
 	{
-
-		CRCoin* r = new CRCoin(x, y);
-		r->SetPosition(x, y);
-		objects.push_back(r);
-
-		obj = new CMyth(x, y, 1, r, NULL);
-
-
+		obj = new CMyth(x, y, 1);
 		break;
 	}
 	case OBJECT_TYPE_MYTH_MUSHROOM:
 	{
-
-		CRMushroom* m = new CRMushroom(x, y);
-		m->SetPosition(x, y);
-		objects.push_back(m);
-
-		CRLeaf* m2 = new CRLeaf(x, y);
-		m2->SetPosition(x, y);
-		objects.push_back(m2);
-
-		obj = new CMyth(x, y, 2, m, m2);
-
-
+		obj = new CMyth(x, y, 2);
+		break;
+	}
+	case OBJECT_TYPE_MYTH_1UP:
+	{
+		obj = new CMyth(x, y, 3);
 		break;
 	}
 
@@ -464,7 +456,6 @@ void CPlayScene::Update(DWORD dt)
 			if (cy < a && cy >= b) cyy = b; else
 			//slowing pan camera to new location
 		{
-			DebugOut(L"CY: %f\n", cy);
 			if (cy < cyy)
 				cyy -= 10;
 			if (cy > cyy)

@@ -244,7 +244,7 @@ hud.txt
 9 	655	166
 8	703	118
 9	1456	150
-9	1423	-88
+24	1423	-88
 
 #ID	x	y	length	height	sprite
 #Pipe

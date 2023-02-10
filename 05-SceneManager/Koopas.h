@@ -2,10 +2,10 @@
 #include "GameObject.h"
 #include "Mario.h"
 
-#define KOOPAS_GRAVITY 0.002f
+#define KOOPAS_GRAVITY 0.001f
 #define KOOPAS_WALKING_SPEED 0.05f
 #define KOOPAS_SHELL_SPEED 0.2f
-#define KOOPAS_JUMP_SPEED_Y 0.5f
+#define KOOPAS_JUMP_SPEED_Y 0.35f
 
 #define KOOPAS_BBOX_WIDTH 16
 #define KOOPAS_BBOX_HEIGHT 28
@@ -29,6 +29,7 @@
 class CKoopas : public CGameObject
 {
 	int whatever = 0;
+	int isOnPlatform;
 protected:
 	float ax;
 	float ay;
@@ -49,6 +50,7 @@ protected:
 	virtual void OnCollisionWith(LPCOLLISIONEVENT e);
 
 public:
+	int isBeingHold = 0;
 	CKoopas(float x, float y);
 	virtual void SetState(int state);
 	void Attacked();
@@ -77,6 +79,7 @@ protected:
 	virtual void OnCollisionWith(LPCOLLISIONEVENT e);
 
 public:
+	int isBeingHold = 0;
 	CSuperKoopas(float x, float y);
 	virtual void SetState(int state);
 	void Attacked();

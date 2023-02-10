@@ -27,3 +27,4 @@ height	720
 70	textures\titlescreen.png
 80	textures\worldmap sprites.png
 90	textures\worldmap.png
+100	textures\titlescreenbackground.png

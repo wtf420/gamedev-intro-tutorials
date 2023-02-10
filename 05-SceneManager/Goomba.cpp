@@ -155,7 +155,7 @@ void CGoomba::SetState(int state)
 			if (mx > x)
 				vx = -GOOMBA_WALKING_SPEED; else
 				vx = GOOMBA_WALKING_SPEED;
-			vy = -0.5f;
+			vy = -GOOMBA_JUMP_SPEED_Y;
 			ay = GOOMBA_GRAVITY;
 			break;
 		case GOOMBA_STATE_WALKING: 
@@ -349,7 +349,7 @@ void CSuperGoomba::SetState(int state)
 		if (mx > x)
 			vx = -GOOMBA_WALKING_SPEED; else
 			vx = GOOMBA_WALKING_SPEED;
-		vy = -0.5f;
+		vy = -GOOMBA_JUMP_SPEED_Y;
 		ay = GOOMBA_GRAVITY;
 		break;
 	case GOOMBA_STATE_SUPER_WALKING:

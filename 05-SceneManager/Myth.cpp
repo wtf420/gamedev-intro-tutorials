@@ -2,7 +2,7 @@
 #include "Debug.h"
 #include "Rewards.h"
 
-CMyth::CMyth(float x, float y, int t, CGameObject* m, CGameObject* l) : CGameObject(x, y) {
+CMyth::CMyth(float x, float y, int t) : CGameObject(x, y) {
 	mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
 	type = t;
 	touched = false;
@@ -10,17 +10,6 @@ CMyth::CMyth(float x, float y, int t, CGameObject* m, CGameObject* l) : CGameObj
 	maxY = y - 8;
 	maxvy = 0;
 	ay = 0;
-
-	switch (type)
-	{
-		case TYPE_COIN:
-			coin = dynamic_cast<CRCoin*>(m);
-		break;
-		case TYPE_MUSHROOM:
-			mushroom = dynamic_cast<CRMushroom*>(m);
-			leaf = dynamic_cast<CRLeaf*>(l);
-		break;
-	}
 }
 
 void CMyth::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
@@ -39,7 +28,7 @@ void CMyth::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			y = originalY;
 			ay = 0;
 			vy = 0;
-			if (type == TYPE_MUSHROOM)
+			if (type == TYPE_MUSHROOM || type == TYPE_1UP)
 				Reward();
 		}
 
@@ -60,7 +49,6 @@ void CMyth::Interact()
 
 void CMyth::Reward()
 {
-	
 	switch (type)
 	{
 	case TYPE_COIN:
@@ -69,24 +57,42 @@ void CMyth::Reward()
 	case TYPE_MUSHROOM:
 		SpawnMushroom();
 		break;
+	case TYPE_1UP:
+		Spawn1Up();
+		break;
+	default:
+		break;
 	}
 }
 
 void CMyth::SpawnCoin()
 {
+	CRCoin* coin = new CRCoin(x, y);
+	((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->Add(coin);
 	coin->Start();
+
+}
+
+void CMyth::Spawn1Up()
+{
+	CR1UpMushroom* up = new CR1UpMushroom(x, y);
+	((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->Add(up);
+	up->Start();
+
 }
 
 void CMyth::SpawnMushroom()
 {
 	if (mario->GetLevel() == MARIO_LEVEL_SMALL)
 	{
-		leaf->Delete();
+		CRMushroom* mushroom = new CRMushroom(x, y);
+		((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->Add(mushroom);
 		mushroom->Start();
 	}
 	else
 	{
-		mushroom->Delete();
+		CRLeaf* leaf = new CRLeaf(x, y);
+		((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->Add(leaf);
 		leaf->Start();
 	}
 }

@@ -2,11 +2,11 @@
 #include "GameObject.h"
 #include "Mario.h"
 
-#define GOOMBA_GRAVITY 0.002f
+#define GOOMBA_GRAVITY 0.001f
 #define GOOMBA_WALKING_SPEED 0.05f
 
-#define GOOMBA_JUMP_SPEED_Y		0.3f
-#define GOOMBA_LEAP_SPEED_Y		0.4f
+#define GOOMBA_JUMP_SPEED_Y		0.25f
+#define GOOMBA_LEAP_SPEED_Y		0.35f
 
 #define GOOMBA_BBOX_WIDTH 16
 #define GOOMBA_BBOX_HEIGHT 16

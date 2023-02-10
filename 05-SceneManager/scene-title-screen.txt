@@ -1,6 +1,7 @@
 # list of object assets to load in this scene
 [ASSETS]
 mario.txt
+luigi.txt
 titlescreen.txt
 background.txt
 hud.txt
@@ -16,6 +17,7 @@ koopas.txt
 #CENTER: 200 LEFT BUSH: 130 RIGHTBUSH: 270
 
 100	0	150	100069
+101	200	100	19013
 
 #TITLE CARD
 23	200	-60	19011
@@ -31,6 +33,8 @@ koopas.txt
 
 # MARIO
 -2	270	165
+# LUIGI
+-3	130	165
 
 #OTHER FALLING STUFF
 19	100	-20	#MUSHROOM

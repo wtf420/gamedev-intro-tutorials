@@ -34,6 +34,7 @@ void CKoopas::GetBoundingBox(float& left, float& top, float& right, float& botto
 void CKoopas::OnNoCollision(DWORD dt)
 {
 	currentPlatform = NULL;
+	isOnPlatform = 0;
 
 	if (this->state != KOOPAS_STATE_CARRIED)
 	{
@@ -45,7 +46,10 @@ void CKoopas::OnNoCollision(DWORD dt)
 void CKoopas::OnCollisionWith(LPCOLLISIONEVENT e)
 {
 	if (!e->obj->IsBlocking()) return;
-	if (e->ny <= 0) currentPlatform = e->obj;
+	if (e->ny <= 0) {
+		currentPlatform = e->obj;
+		isOnPlatform = 1;
+	}
 	if (dynamic_cast<CKoopas*>(e->obj)) return;
 	if (dynamic_cast<CMyth*>(e->obj) && this->state == KOOPAS_STATE_MOVING_SHELL)
 		dynamic_cast<CMyth*>(e->obj)->Interact();
@@ -102,56 +106,6 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		vy += ay * dt;
 		vx += ax * dt;
 	}
-
-	if (state == KOOPAS_STATE_WALKING && currentPlatform != NULL)
-	{
-		if (dynamic_cast<CBrickWithCoin*>(currentPlatform))
-		{
-			CBrickWithCoin* u = dynamic_cast<CBrickWithCoin*>(currentPlatform);
-			float ux, uy;
-			u->GetPosition(ux, uy);
-			if ((x < ux - 8.0f && vx < 0) || (x > ux + 8.0f && vx > 0))
-			{
-				vx = -vx;
-			}
-		}
-		if (dynamic_cast<CPlatformOneWay*>(currentPlatform))
-		{
-			CPlatformOneWay* u = dynamic_cast<CPlatformOneWay*>(currentPlatform);
-			float left = u->GetLeftPosition();
-			if ((x < left && vx < 0) || (x > left + u->length && vx > 0))
-			{
-				vx = -vx;
-			}
-		}
-		else if (dynamic_cast<CPlatform3*>(currentPlatform))
-		{
-			CPlatform3* u = dynamic_cast<CPlatform3*>(currentPlatform);
-			float left = u->GetLeftPosition();
-			if ((x < left && vx < 0) || (x > left + u->length && vx > 0))
-			{
-				vx = -vx;
-			}
-		}
-		else if (dynamic_cast<CPlatform2*>(currentPlatform))
-		{
-			CPlatform2* u = dynamic_cast<CPlatform2*>(currentPlatform);
-			float ux, uy;
-			u->GetPosition(ux, uy);
-			if ((x < ux) && (vx < 0) || (x > ux + u->length && vx > 0))
-				vx = -vx;
-		}
-		else if (dynamic_cast<CPlatform*>(currentPlatform))
-		{
-			CPlatform* u = dynamic_cast<CPlatform*>(currentPlatform);
-			float ux, uy, l;
-			l = u->length * 16.0f;
-			u->GetPosition(ux, uy);
-			if ((x < ux - 8.0f && vx < 0) || (x > ux - 8.0f + l && vx > 0))
-				vx = -vx;
-		}
-	}
-
 	if ((state == KOOPAS_STATE_SHELL) && (GetTickCount64() - die_start > KOOPAS_RESPAWN_TIMEOUT))
 	{
 		SetState(KOOPAS_STATE_WALKING);
@@ -172,6 +126,17 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	CGameObject::Update(dt, &coObjects2);
 	CCollision::GetInstance()->Process(this, dt, &coObjects2);
+
+	if (isOnPlatform == 1)
+	{
+		if (state == KOOPAS_STATE_WALKING && currentPlatform != NULL)
+		{
+			float l, t, r, b;
+			currentPlatform->GetBoundingBox(l, t, r, b);
+			if (this->x - KOOPAS_BBOX_WIDTH / 4 < l || this->x + KOOPAS_BBOX_WIDTH / 4 > r)
+				vx = -vx;
+		}
+	}
 }
 
 

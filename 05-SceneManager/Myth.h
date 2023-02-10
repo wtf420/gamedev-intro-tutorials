@@ -16,6 +16,7 @@
 
 #define TYPE_COIN 1
 #define TYPE_MUSHROOM 2
+#define TYPE_1UP 3
 
 #define UP_SPEED_Y		0.1f
 #define ACCEL_SPEED_Y	0.002f
@@ -27,16 +28,14 @@ public:
 	float ay;				// acceleration on y 
 	bool touched;
 	CMario* mario;
-	CRCoin* coin;
-	CRMushroom* mushroom;
-	CRLeaf* leaf;
 
-	CMyth(float x, float y, int t, CGameObject* m, CGameObject* l);
+	CMyth(float x, float y, int t);
 	void Interact();
 	void Render();
 	void Reward();
 	void SpawnCoin();
 	void SpawnMushroom();
+	void Spawn1Up();
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	void GetBoundingBox(float& l, float& t, float& r, float& b);
 };

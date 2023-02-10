@@ -130,6 +130,92 @@ void CRMushroom::GetBoundingBox(float& l, float& t, float& r, float& b)
 	b = t + COIN_MYTH_BBOX_HEIGHT;
 }
 
+/*
+* **************************************************
+*					1UP MUSHROOM
+* **************************************************
+*/
+
+void CR1UpMushroom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+{
+	if (y > maxY && vy < 0) vy += ay * dt; else
+		if (y <= maxY && vy < 0)
+		{
+			this->ay = MUSHROOM_GRAVITY;
+			this->ax = 0;
+			vy = 0;
+			vx = -MUSHROOM_WALKING_SPEED;
+			collidable = 1;
+		}
+
+	vy += ay * dt;
+	vx += ax * dt;
+
+	vector<LPGAMEOBJECT> coObjects2;
+	for (int k = 0; k < coObjects->size(); k++)
+	{
+		CPlatformOneWay* u = dynamic_cast<CPlatformOneWay*>(coObjects->at(k));
+		float top = 0;
+		if (u) top = u->GetTopPosition();
+		if ((!u) || (u == currentPlatform) || (u && top >= y))
+		{
+			coObjects2.push_back(coObjects->at(k));
+		}
+	}
+	CGameObject::Update(dt, &coObjects2);
+	CCollision::GetInstance()->Process(this, dt, &coObjects2);
+}
+
+void CR1UpMushroom::OnNoCollision(DWORD dt)
+{
+	currentPlatform = NULL;
+	x += vx * dt;
+	y += vy * dt;
+};
+
+void CR1UpMushroom::Died()
+{
+	isDeleted = true;
+};
+
+void CR1UpMushroom::OnCollisionWith(LPCOLLISIONEVENT e)
+{
+	if (!e->obj->IsBlocking()) return;
+	if (dynamic_cast<CRMushroom*>(e->obj)) return;
+	if (e->ny <= 0) currentPlatform = e->obj;
+
+	if (e->ny != 0)
+	{
+		vy = 0;
+	}
+	else if (e->nx != 0)
+	{
+		vx = -vx;
+	}
+}
+
+void CR1UpMushroom::Start()
+{
+	vy = -MUSHROOM_UP_SPEED_Y;
+	maxvy = 0;
+	ay = 0;
+	ax = 0;
+}
+
+void CR1UpMushroom::Render()
+{
+	CAnimations* animations = CAnimations::GetInstance();
+	CAnimations::GetInstance()->Get(ID_ANI_1UP_MUSHROOM)->Render(x, y);
+}
+
+void CR1UpMushroom::GetBoundingBox(float& l, float& t, float& r, float& b)
+{
+	l = x - COIN_MYTH_BBOX_WIDTH / 2;
+	t = y - COIN_MYTH_BBOX_HEIGHT / 2;
+	r = l + COIN_MYTH_BBOX_WIDTH;
+	b = t + COIN_MYTH_BBOX_HEIGHT;
+}
+
 /*******************************************************************
 							LEAF
 /********************************************************************/

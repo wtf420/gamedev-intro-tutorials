@@ -15,6 +15,7 @@
 #define COIN_MAX_Y 48.0f
 
 #define ID_ANI_MUSHROOM 63000
+#define ID_ANI_1UP_MUSHROOM 63001
 
 #define MUSHROOM_MYTH_BBOX_WIDTH 16
 #define MUSHROOM_MYTH_BBOX_HEIGHT 16
@@ -70,6 +71,36 @@ public:
 	CGameObject* currentPlatform;
 
 	CRMushroom(float x, float y) : CGameObject(x, y) {
+		originalY = y;
+		maxY = y - MUSHROOM_MAX_Y;
+		maxvy = 0;
+		ax = 0;
+		ay = 0;
+		collidable = 0;
+		currentPlatform = NULL;
+	}
+
+	virtual int IsCollidable() { return collidable; };
+	virtual int IsBlocking() { return 0; }
+	void Start();
+	void Render();
+	void Died();
+	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
+	void GetBoundingBox(float& l, float& t, float& r, float& b);
+	virtual void OnNoCollision(DWORD dt);
+	virtual void OnCollisionWith(LPCOLLISIONEVENT e);
+};
+
+//*********************************************************************
+
+class CR1UpMushroom : public CGameObject {
+public:
+	int collidable;
+	float originalY, maxY, maxvy;
+	float ax, ay;				// acceleration on y
+	CGameObject* currentPlatform;
+
+	CR1UpMushroom(float x, float y) : CGameObject(x, y) {
 		originalY = y;
 		maxY = y - MUSHROOM_MAX_Y;
 		maxvy = 0;
