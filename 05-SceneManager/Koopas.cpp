@@ -165,7 +165,7 @@ void CKoopas::Attacked()
 	if (mx > x)
 		vx = -KOOPAS_WALKING_SPEED; else
 		vx = KOOPAS_WALKING_SPEED;
-	vy = -0.5f;
+	vy = -0.4f;
 	ay = KOOPAS_GRAVITY;
 }
 
